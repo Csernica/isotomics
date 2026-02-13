@@ -1,0 +1,40 @@
+{% set name = "isotomics-automated" %}
+{% set version = "0.1.0" %}
+
+package:
+  name: {{ name }}
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vv
+
+requirements:
+  host:
+    - python >=3.10.12
+    - pip
+    - numpy >=1.23.5
+    - setuptools
+    - wheel
+  run:
+    - python >=3.10.12
+    - numpy >=1.23.5
+    - pandas >=2.0.0
+    - tqdm
+    - matplotlib >=3.10.0
+    - seaborn >=0.13.0
+    - networkx >=3.1
+    - sympy >=1.12
+    - scipy >=1.14.0
+
+about:
+  summary: "M+1 data processing and simulation for Orbitrap-IRMS fragmentation experiments"
+  license: MIT
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - tcs

@@ -1,0 +1,23 @@
+MN Relative Abundance,File Type,Average,StdError,RelStdError,Fragment,IsotopeRatio
+13C,Smp,0.674226087,5.41E-05,8.02E-05,44,
+13C,Std,0.677952222,5.48E-05,8.08E-05,44,
+15N,Smp,0.10994349,3.49E-05,0.00031712,44,
+15N,Std,0.110460186,3.55E-05,0.000321824,44,
+D,Smp,0.02585515,1.83E-05,0.000708957,44,
+D,Std,0.025999973,1.86E-05,0.000715194,44,
+Unsub,Smp,0.189975273,4.75E-05,0.000250191,44,
+Unsub,Std,0.18558762,4.77E-05,0.000257193,44,
+,Smp,0.036229382,1.70E-05,0.000469039,full_molecular_average,13C/Unsub
+,Std,0.035811162,1.69E-05,0.000472738,full_molecular_average,13C/Unsub
+,Smp,0.003762635,5.49E-06,0.001459403,full_molecular_average,15N/Unsub
+,Std,0.003768006,5.53E-06,0.001467072,full_molecular_average,15N/Unsub
+,Smp,0.004720012,6.19E-06,0.001311828,full_molecular_average,18O/Unsub
+,Std,0.004730494,6.23E-06,0.001317583,full_molecular_average,18O/Unsub
+,Smp,0.001190589,3.11E-06,0.002612345,full_molecular_average,D/Unsub
+,Std,0.001186887,3.10E-06,0.00261264,full_molecular_average,D/Unsub
+13C,Smp,0.879737322,0.000142913,0.00016245,full_relative_abundance,
+13C,Std,0.878464185,0.000145201,0.00016529,full_relative_abundance,
+15N,Smp,0.09135887,0.000126437,0.001383949,full_relative_abundance,
+15N,Std,0.092423914,0.000128576,0.001391146,full_relative_abundance,
+D,Smp,0.028903808,7.41E-05,0.002562758,full_relative_abundance,
+D,Std,0.029111902,7.48E-05,0.002568807,full_relative_abundance,

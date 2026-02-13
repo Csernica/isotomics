@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.pdb
+*.egg-info/
+build/
+dist/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Conda
+conda-bld/
+*.conda
+*.tar.bz2
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
