@@ -6,9 +6,11 @@ package:
   version: {{ version }}
 
 source:
-  path: ..
+  url: https://github.com/csernica/isotomics/archive/refs/tags/v0.1.0.tar.gz
+  sha256: bbe59a271a4fc7d95478da4b106b36cb8c49119f73a00c56345efb9e22318a0f
 
 build:
+  noarch: python
   number: 0
   script: {{ PYTHON }} -m pip install . -vv
 
@@ -30,11 +32,19 @@ requirements:
     - sympy >=1.12
     - scipy >=1.14.0
 
+test:
+  imports:
+    - isotomics
+  commands:
+    - python -c "import isotomics"
+
 about:
+  home: https://github.com/csernica/isotomics
+  dev_url: https://github.com/csernica/isotomics
   summary: "M+1 data processing and simulation for Orbitrap-IRMS fragmentation experiments"
   license: MIT
   license_file: LICENSE
 
 extra:
   recipe-maintainers:
-    - tcs
+    - csernica

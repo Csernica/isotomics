@@ -64,7 +64,6 @@ This is the dataset used by the quickstart command.
 
 ## Citation
 
-Csernica, Timothy and Zeichner, Sarah S. (2024).  
-Csernica/Isotomics-Automated.  
-https://doi.org/10.5281/zenodo.10871152
+Csernica, Timothy and Zeichner, Sarah S. (2026).  
+Csernica/isotomics.
 
