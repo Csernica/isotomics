@@ -1,13 +1,13 @@
 # Isotomics-Automated
 
-`isotomics-automated` provides tools for M+1 Orbitrap-IRMS workflows:
+`isotomics` provides tools for M+1 Orbitrap-IRMS workflows:
 - simulate expected precision for proposed experiments
 - process experimental `.isox` data to estimate site-specific isotope values
 
 ## Install
 
 ```bash
-pip install isotomics-automated
+pip install isotomics
 ```
 
 ## Quickstart
@@ -66,4 +66,5 @@ This is the dataset used by the quickstart command.
 
 Csernica, Timothy and Zeichner, Sarah S. (2026).  
 Csernica/isotomics.
+
 

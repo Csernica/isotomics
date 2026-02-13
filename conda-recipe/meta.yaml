@@ -1,4 +1,4 @@
-{% set name = "isotomics-automated" %}
+{% set name = "isotomics" %}
 {% set version = "0.1.0" %}
 
 package:
@@ -6,7 +6,7 @@ package:
   version: {{ version }}
 
 source:
-  url: https://github.com/csernica/isotomics/archive/refs/tags/v0.1.0.tar.gz
+  url: https://github.com/csernica/isotomics/archive/refs/tags/v0.1.1.tar.gz
   sha256: bbe59a271a4fc7d95478da4b106b36cb8c49119f73a00c56345efb9e22318a0f
 
 build:
@@ -48,3 +48,4 @@ about:
 extra:
   recipe-maintainers:
     - csernica
+

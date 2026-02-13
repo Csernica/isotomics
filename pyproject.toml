@@ -3,8 +3,8 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "isotomics-automated"
-version = "0.1.0"
+name = "isotomics"
+version = "0.1.1"
 description = "M+1 data processing and simulation for Orbitrap-IRMS fragmentation experiments"
 readme = "README.md"
 requires-python = ">=3.10.12"
@@ -44,4 +44,5 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 isotomics = ["input_data/**"]
+
 
