@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>isotomics.solveSystem &#8212; isotomics  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="isotomics.spectrumVis" href="spectrumVis.html" />
+    <link rel="prev" title="isotomics.solveExperimentalData" href="solveExperimentalData.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-isotomics.solveSystem">
+<span id="isotomics-solvesystem"></span><h1>isotomics.solveSystem<a class="headerlink" href="#module-isotomics.solveSystem" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.GJElim">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">GJElim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">augMatrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">AugAmount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.GJElim" title="Link to this definition">¶</a></dt>
+<dd><p>A Gauss-Jordan Elimination algorithm. Useful to track the results of underconstrained systems, to see which isotopologues covary. We can determine which isotopologues are solved for by interrogating the null space of the GJ solution.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>Matrix: The matrix to eliminate.
+augMatrix: Whether the matrix is augmented or not.
+AugAmount: The number of columns which are augmented, e.g. to the right of the line.
+store: A boolean. If true, we store the results of every step of the elimination and output them, for debugging.
+sanitize: A boolean. If true, every step, checks the entire matrix and sets entries which are very close to 0 as 0. This helps avoid floating point errors.
+eps: A float. Values with absolute value &lt; epsilon are considered 0s and are not selected as pivots. Helps avoid floating point errors.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>M: The solved matrix after GJ elimination
+rank: An integer, the rank of the solved matrix
+storage: If store == True, returns a list giving the matrix at every step, for debugging.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.M1MonteCarlo">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">M1MonteCarlo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">standardData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampleData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OCorrection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotopologuesDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragmentationDictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GJ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugMatrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeSubs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omitSubs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disableProgress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbTheoryOAmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experimentalOCorrectList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abundanceCorrect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debugUnderconstrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotUnconstrained</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storePerturbedSamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storeOCorrect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explicitOCorrect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbOverrideList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.M1MonteCarlo" title="Link to this definition">¶</a></dt>
+<dd><p>The Monte Carlo routine which is applied to M+1 measurements. This perturbs sample, standard, and M+N Relative abundance corrections N times, constructing and solving the matrix each time and recording the M+N Relative abundances. If the solution is underconstrained, it will also attempt to discover which specific isotopologues are not solved for and output this information to the user.</p>
+<dl>
+<dt>Inputs:</dt><dd><p>standardData:  A dictionary; keys are mass selections (“M1”, “M2”) then fragment Keys (“full”, “44”), then information about substitutions, observed abundances, predicted abundances, and errors.
+sampleData: A dictionary; keys are mass selections (“M1”, “M2”) then fragment Keys (“full”, “44”), then information about substitutions, observed abundances, and errors.
+OCorrection: A dictionary, giving a M+N Relative abundance correction factor and associated error for each fragment of each mass selection.
+isotopologuesDict: A dictionary; keys are mass selections, values are dataframes giving all of the isotopologues within that mass selection, including information about their fragmentation.
+fragmentationDictionary: A dictionary, e.g. {‘full’: {‘01’: {‘subgeometry’: [1, 1, 1, 1, 1, 1], ‘relCont’: 1}},</p>
+<blockquote>
+<div><p>‘44’: {‘01’: {‘subgeometry’: [1, ‘x’, ‘x’, 1, 1, ‘x’], ‘relCont’: 1}}} which gives information about the fragments, their subgeometries and relative contributions.</p>
+</div></blockquote>
+<p>N: The number of Monte Carlo simulations to perform.
+GJ: A boolean; True will use the Gauss-Jordan algorithm rather than the numpy solver.
+debugMatrix: A boolean; True (if GJ is also True) will return every step of the Gauss-Jordan solution, helping the user debug issues.
+includeSubs: A list of isotopes, if we want to include only certain isotopes in the matrix. If it is nonempty, only isotopes in the list will be included in the matrix. Generally should be empty.
+omitSubs: A list of isotopes, if we wish to omit certain isotopes from the matrix. If it is nonempty, isotopes in the list will not be included in the matrix. Generally should be empty.
+disableProgress: A boolean; true disables the tqdm bars.
+theory: A boolean, determines whether to calculate fractionation factors from the forward model. Should generally be set to True.
+perturbTheoryOAmt: A float. For each run of the Monte Carlo, the prtvrnt sbundance correction factors can be perturbed; this may be useful because the factors are only known approximately, so this well better estimate error. 0.001 and 0.002 have been useful values before, but it may depend on the system of interest.
+experimentalOCorrectList: A list, containing information about which peaks to use experimental, rather than theoretical, M+N Relative abundance corrections.
+abundanceCorrect: A boolean, determines whether to apply observed abundance correction.
+debugUnderconstrained: If True, attempts to find the null space of the Gauss-Jordan solution to output which sites are well constrained (do not vary with the null space).
+plotUnconstrained: If True, outputs a plot of the null space to visualize how sites covary with each other in the null space.
+storePerturbedSamples: An option to store the perturbed samples from each step of the MC for further investigation.
+perturbOverrideList: perturbSample will automatically perturb all sample acquisitions (M1, M2, M3, M4); in some cases, e.g. when doing an iterated correction for M1, we do not want to perturb all, only M1. This can be specified with this list. (E.g. [‘M1’])
+explicitOCorrect: For each MNKey and each fragment, may define specific bounds on reasonable O correction values.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>results: A dictionary, with GJ and NUMPY as keys. Each is keyed to a list of solutions from those respective algorithms.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.MonteCarloMN">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">MonteCarloMN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Isotopologues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampleData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OCorrection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragmentationDictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeSubs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omitSubs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disableProgress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbTheoryOAmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abundanceCorrect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.MonteCarloMN" title="Link to this definition">¶</a></dt>
+<dd><p>The M+N experiment with N&gt;2 will almost certainly be underconstrained, in contrast to the M+1 which will often be constrained. Additionally, we don’t wish to report these results by updating the original dataframe. For these reasons, we define a separate set of functions for the M+N solution.</p>
+<p>Given an MNKey and sample/standard data, solves the MN system via GJ Elimination N times and stores the results.</p>
+<p>Also returns the composition matrix and a full GJ solution, which are useful later on.</p>
+<dl>
+<dt>Inputs:</dt><dd><p>MNKey: A string, “M2”, “M3”, etc.
+Isotopologues: A dataframe containing isotopologues introduced via that MN experiment together with information about how these isotopologues fragment.
+standardData: a dictionary, keys are MNKeys and values are dictionaries. Then the keys are fragments and</p>
+<blockquote>
+<div><p>values are dictionaries. Then the keys are “Subs”, “Predicted Abundance”, “Observed Abundance”,
+“Error”, giving information about that measurement.</p>
+</div></blockquote>
+<p>sampleData: As standardData, but no predicted abundances.
+OCorrection: A dictionary giving the O correction factors by mass selection and fragment.
+N: The number of Monte Carlo runs to perform.
+includeSubs: A list of isotopes, if we want to include only certain isotopes in the matrix. If it is nonempty, only isotopes in the list will be included in the matrix. Generally should be empty.
+omitSubs: A list of isotopes, if we wish to omit certain isotopes from the matrix. If it is nonempty, isotopes in the list will not be included in the matrix. Generally should be empty.
+disableProgress: A boolean; true disables the tqdm bars.
+perturbTheoryOAmt: A float. For each run of the Monte Carlo, the prtvrnt sbundance correction factors can be perturbed; this may be useful because the factors are only known approximately, so this well better estimate error. 0.001 and 0.002 have been useful values before, but it may depend on the system of interest.
+abundanceCorrect: A boolean, determines whether to apply observed abundance correction factors.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>res: A dictionary keying “GJ” to a list of gauss-jordan solutions to the system
+comp: The initial composition matrix
+solve: The solved GJ system, which is useful for finding codependencies
+meas: The initial measurement vector</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.OValueCorrectTheoretical">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">OValueCorrectTheoretical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predictedMeasurement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processSample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">massThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.OValueCorrectTheoretical" title="Link to this definition">¶</a></dt>
+<dd><p>A theoretical method of calculating M+N Relative abundance correction factors. Looks at predicted measurements from a stochastic distribution and input deltas and sees how much M+N relative abundance is actually observed in the measurement.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>predictedMeasurement: A computed dataset for some input delta values. Should be a perfect dataset.
+processSample: The processed sample input. Checks which peaks were actually observed in order to determine the size of the M+N Relative abundance correction.
+massThreshold: The highest M+N experiment to compute M+N Relative abundance corrections for.
+debug: If true, prints the peaks from predicted measurement and if they were found successfully.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>OValueCorrection: A dictionary, where keys are mass selections, then fragment keys, keyed to floats, where the float gives the M+N Relative abundance correction for that fragment.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.PerturbUValue">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">PerturbUValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">UValuesSmp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.PerturbUValue" title="Link to this definition">¶</a></dt>
+<dd><p>Perturbs the full molecule U Values based on their observed errors.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>UValuesSmp: A dictionary where keys are isotopes and their values dictionaries giving their measured U Value and the error on that measurement.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>UPertub: A dictionary where keys are isotopes and values are floats giving their perturbed U Values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.calcUMN">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">calcUMN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UPerturb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UMNSub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.calcUMN" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the U^M+N value for solution from the monte carlo routine.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>MNKey: “M1”, “M2”, etc.
+dataFrame: A dataframe updated with the M+N relative abundances from the solution to some system.
+UPerturb: The perturbed full molecule U Values for this round of the monte carlo routine.
+UMNSub: Sets the specific substitutions that we will use molecular average U values from to calculate UMN. Otherwise it will use all molecular average U values for that UMN. Recommended to use–the procedure only works for substitions that are totally solved for. For example, if one 13C 13C isotopologue is not solved for precisely in fractional abundance space, we should not use 13C13C in the UMN routine. The best candidates tend to be abundant things–36S, 18O, 13C, 34S, and so forth. An eventual goal is to make a routine which automatically checks this.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>UMN: The U^M+N value for this round of the Monte Carlo routine.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.checkNumber">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">checkNumber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">UVal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.checkNumber" title="Link to this definition">¶</a></dt>
+<dd><p>Helper function for updateRelClumpedDeltas; checks if an isotopologue is fully constrained; if not, does not attempt to calculate relative clumped deltas.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>UVal: A float, the solved U Value for some set of isotopologues
+Number: The number of isotopologues included in the U Value</p>
+</dd>
+<dt>Outputs:</dt><dd><p>UVal if Number == 1, otherwise np.nan.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.checkSolutionIsotopologues">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">checkSolutionIsotopologues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solve</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Isotopologues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">massKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.checkSolutionIsotopologues" title="Link to this definition">¶</a></dt>
+<dd><p>Given a solution to an augmented matrix which associates isotopologues with their M+N Relative abundance, recovers the identity of each isotopologue from its column in the augmented matrix. Computes the stochastic abundance of each constraint, as well as their compositions and number.</p>
+<p>You can think of this as a lookup function, which goes through the rows of the solved GJ solution and determines which columns (isotopologues) contribute to each.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>solve: The output of GJElim
+Isotopologues: A dataFrame containing the MN population of Isotopologues
+massKey: ‘M1’, ‘M2’, etc.
+numerical: True if we want to pull out U Values or M+N Relative Abundance. When running the MC routine, we don’t, we only need to know which row corresponds to which isotopologues.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>a Pandas dataFrame containing information about the isotopologues corresponding to the GJ Solution.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.cleanNanMean">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">cleanNanMean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.cleanNanMean" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.cleanNanStd">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">cleanNanStd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.cleanNanStd" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.computeMNUValues">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">computeMNUValues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MNSolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">applyUMN</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clumpU</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.computeMNUValues" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a dataframe containing the M+N Solution in M+N Relative abundance space, transfers these to U value space, and then calculates clumped and site-specific delta values from these U Values.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>MNSolution: A dataframe containing the M+N results in M+N Relative abundance space as well as the U^M+N value.
+MNKey: “M2”, “M3”, etc.
+molecularDataFrame: The original dataframe containing information about sites of the molecule.
+applyUMN: A boolean, determines whether to calculate U Values using U^M+N or not.
+clumpU: A boolean; set to True if applying some numerical routine to deal with large clumps.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>MNSolution: The dataframe updated with clumped and site-specific deltas.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.computeStdUVal">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">computeStdUVal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condensed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNDictStd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.computeStdUVal" title="Link to this definition">¶</a></dt>
+<dd><p>Helper function for updateRelClumpedDeltas; computes the UValue of a constrained isotopologue in the standard. Only returns U Values for isotopologues which are fully constrained; otherwise returns np.nan</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>condensed: The byAtom string for an isotopologue
+MNKey: “M2”, “M3”, etc.
+MNDictStd: A dictionary, where keys are MN Keys and values are dataframes containing the isotopologues and their concentrations for the calculated standard.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>The calculated U value for the standard, or np.nan</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.constructMatrix">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">constructMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Isotopologues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragmentationDictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeSubs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omitSubs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.constructMatrix" title="Link to this definition">¶</a></dt>
+<dd><p>Constructs the matrix and the measurement vector for the Monte Carlo method to solve. We could increase speed by only constructing the composition matrix once and tracking how to reconstruct the measurement vector, rather than solving it each time. But we have not implemented this.</p>
+<dl>
+<dt>Inputs:</dt><dd><p>Isotopologues: A dataFrame containing isotopologues and information about their fragmentation.
+smp: A dataframe giving the corrected and standardized observations by fragments and isotope.
+MNKey: A string, telling us which M+N experiment we are solving (“M1”, “M2”, etc.)
+fragmentationDictionary: A dictionary, e.g. {‘full’: {‘01’: {‘subgeometry’: [1, 1, 1, 1, 1, 1], ‘relCont’: 1}},</p>
+<blockquote>
+<div><p>‘44’: {‘01’: {‘subgeometry’: [1, ‘x’, ‘x’, 1, 1, ‘x’], ‘relCont’: 1}}} which gives information about the fragments, their subgeometries and relative contributions.</p>
+</div></blockquote>
+<p>includeSubs: A list of isotopes, if we want to include only certain isotopes in the matrix. If it is nonempty, only isotopes in the list will be included in the matrix. Generally should be empty.
+omitSubs: A list of isotopes, if we wish to omit certain isotopes from the matrix. If it is nonempty, isotopes in the list will not be included in the matrix. Generally should be empty.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>comp: The composition matrix as a numpy array. Columns are isotopologues, rows are observations.
+meas: The measurement vector as a numpy array. Rows correspond to observations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.experimentalOCorrection">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">experimentalOCorrection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragToCorrect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subToCorrect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbedSample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OValueCorrection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragsToBenchmarkFrom</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.experimentalOCorrection" title="Link to this definition">¶</a></dt>
+<dd><p>A complicated procedure to generate experimental M+N Relative abundance correction factors in some fringe cases.  If you don’t have a good understanding of what this is trying to do, you probably should not be using it.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>MNKey: “M1”, “M2”, etc.
+fragToCorrect: A string, giving the fragment that should be corrected (e.g. “61”)
+subToCorrect: The substitution to use to correct; we anticipate the M+N Relative abundance observed for this substitution in this fragment should be the same as the M+N Relative abundance observed for this substitution in another fragment.
+perturbedSample: The perturbed sample data, a dictionary.
+OValueCorrection: A dictionary giving the M+N Relative abundance correction factors.
+fragsToBenchmarkFrom: A list, giving fragments where we expect to have accurately observed the M+N Relative abundance of the substitution in question. E.g. [‘full’, ‘133’,’104]</p>
+</dd>
+<dt>Outputs:</dt><dd><p>OValueCorrection: The same dictionary, updated with the experimental correction.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.findFullyConstrained">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">findFullyConstrained</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nullSpaceCycles</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.findFullyConstrained" title="Link to this definition">¶</a></dt>
+<dd><p>Given the null space cycles, as a dictionary, finds which isotopologues do not vary with any others. I.e. these isotopologues are solved for precisely. Outputs these as a list.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>nullSpaceCycles: A dictionary; keys are isotopologues, and their values are sets of the isotopologues which they covary with.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>actuallyConstrained: A list of the isotopologues which do not covary with any other isotopologues.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.findNullSpaceCycles">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">findNullSpaceCycles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Isotopologues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.findNullSpaceCycles" title="Link to this definition">¶</a></dt>
+<dd><p>For underconstrained systems, it is hard to know which variables are correlated with one another. This function shows us. It does so by finding the null space, performing GJ elimination on it, then searching each row of the null space to see where nonzero entries are–a nonzero entry means two isotopologues are codependent.</p>
+<p>It then picks out the strings corresponding to codependent indices.</p>
+<p>It then constructs a dictionary where keys are strings corresponding to isotopologues and values are lists of strings. If an isotopologue can covary with another, then the list contains that isotopologue.</p>
+<p>It optionally plots a visualization of these codependencies.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>comp: The composition matrix for GJ elimination
+Isotopologues: The dataFrame giving all isotopologues of an M+N measurement.
+plot: If true, plots a visualization of codependencies.</p>
+</dd>
+<dt>Ouputs:</dt><dd><p>nullSpaceCycles: A dictionary; keys are isotopologues, and their values are sets of the isotopologues which they covary with.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.modifyOValueCorrection">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">modifyOValueCorrection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">OValueCorrection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variableOCorrect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explicitOCorrect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.002</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.modifyOValueCorrection" title="Link to this definition">¶</a></dt>
+<dd><p>Perturbs the M+N Relative abundance correction factors, for example if they are only approximately known.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>OValueCorrection: A dictionary, where keys are mass selections and values are dictionaries; in each dictionary, the keys are fragment keys and values are floats, where the float gives the observed abundance correction for that fragment.
+variableOCorrect: A copy of the OValueCorrection dictionary, so we are not modifying it directly.
+MNKey: “M1”, “M2”, etc.
+amount: The size of the perturbation in relative terms (e.g. 2 per mil)
+explicitOCorrect: An override dictionary, where an explicit distribution can be set for each fragment, rather than using the input from OValueCorrection and the calculated standard error.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>variableOCorrect: A perturbed copy of the OValueCorrection dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.perturbSample">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">perturbSample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampleData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbedStandard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OCorrection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experimentalOCorrectList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correctionFactors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abundanceCorrect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explicitOCorrect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbOverrideList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.perturbSample" title="Link to this definition">¶</a></dt>
+<dd><p>Takes sample data and perturbs it multiple ways–first perturbs experimental error, then applies (fractionation) correction factors, then applies M+N Relative abundance correction factors. Finally processes the perturbed sample into a dataframe to be looped into the matrix solver.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>sampleData: A dictionary; keys are mass selections (“M1”, “M2”) then fragment Keys (“full”, “44”), then information about substitutions, observed abundances, and errors.
+perturbedStandard: A dictionary, the output of perturbStandard. Keys are mass selections, then fragment keys. Contains information about the correction factors for each peak.
+OCorrection: A dictionary, giving a M+N Relative abundance correction factor for each fragment of each mass selection.
+experimentalOCorrectList: A list, containing information about which peaks to use experimental, rather than theoretical, M+N Relative abundance corrections.
+correctionFactors: A boolean, determines whether to apply sample/standard correction factors.
+abundanceCorrect: A boolean, determines whether to apply observed abundance correction factors.
+perturbOverrideList: perturbSample will automatically perturb all sample acquisitions (M1, M2, M3, M4); in some cases, e.g. when doing an iterated correction for M1, we do not want to perturb all, only M1. This can be specified with this list. (E.g. [‘M1’])
+explicitOCorrect: For each MNKey and each fragment, may provide bounds on reasonable O correction values.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>measurementData: A dictionary containing a dataframe for each M+N experiment. The dataframe gives the final corrected relative abundances for each peak of each fragment.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.perturbSampleCorrectionFactors">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">perturbSampleCorrectionFactors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perturbedSample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbedStandard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renormalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.perturbSampleCorrectionFactors" title="Link to this definition">¶</a></dt>
+<dd><p>Applies the calculated correction factors from the standard to our sample. The most important choice here is the renormalize boolean. As discussed in the appendix, renormalizing at this step can remove the “W” factor, leading to a more accurate solution. In some instances, one may wish not to renormalize. By default it should be True.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>perturbedSample: A dictionary, the output of perturbSampleError. Keys are mass selections, then fragment keys. Contains information about observed abundance and substitutions.
+perturbedStandard: A dictionary, the output of perturbStandard. Keys are mass selections, then fragment keys. Contains information about the correction factors for each peak.
+renormalize: A boolean. See description.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>correctedSample: A dictionary; keys are mass selections, then fragment keys. Contains information about observed abundance and substitutions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.perturbSampleError">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">perturbSampleError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampleData</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.perturbSampleError" title="Link to this definition">¶</a></dt>
+<dd><p>Perturbs sample data according to observed experimental errors. For each mass selection, for each fragment, perturbs based on experimental error, then renormalizes. This can be seen as a companion function to perturbStandard; differs in that it does not calculate correction factors and outputs a new dictionary.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>sampleData: A dictionary; keys are mass selections (“M1”, “M2”) then fragment Keys (“full”, “44”), then information about substitutions, observed abundances, and errors.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>perturbedSample: A dictionary; keys are mass selections, then fragment keys. Contains information about observed abundance and substitutions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.perturbSampleOCorrection">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">perturbSampleOCorrection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correctedSample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">OCorrection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbOverrideList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.perturbSampleOCorrection" title="Link to this definition">¶</a></dt>
+<dd><p>Applies M+N Relative abundance correction factors to the sample. These factors scale the observed M+N Relative abundances to correct for unobserved peaks.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>correctedSample: A dictionary, the output of perturbSampleCorrectionFactors. Keys are mass selections, then fragment keys. Contains information about observed abundance and substitutions.
+OCorrection: A dictionary, giving a M+N Relative abundance correction factor for each fragment of each mass selection.
+perturbOverrideList: For M1 Iterated correction, do not want to use all mass selections, only M1; set to [‘M1’]</p>
+</dd>
+<dt>Outputs:</dt><dd><p>OCorrectedSample: A dictionary; keys are mass selections, then fragment keys. Contains information about observed abundance and substitutions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.perturbStandard">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">perturbStandard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">standardData</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.perturbStandard" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a dictionary with standard data. For each fragment, perturbs every measurement according to its experimental error, then renormalizes. Calculates correction factors by comparing these perturbed values to the predicted abundance of each peak.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>standardData: A dictionary; keys are mass selections (“M1”, “M2”) then fragment Keys (“full”, “44”), then information about substitutions, observed abundances, predicted abundances, and errors.
+theory: A boolean. If true, calculates correction factors.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>standardData: The same dictionary as the input, with entries for the perturbed observation as well as correction factors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.processM1MCResults">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">processM1MCResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M1Results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UValuesSmp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isotopologuesDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">GJ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disableProgress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UMNSub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.processM1MCResults" title="Link to this definition">¶</a></dt>
+<dd><p>Processes results of M1 Monte Carlo, converting the M+N Relative abundances into delta space and reordering to match the order of the original input dataframe.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>M1Results: A dictionary containing the M1 results from the M1 Monte Carlo routine.
+UValuesSmp: A dictionary where keys isotopes and their values dictionaries giving their measured U Value and the error on that measurement.
+isotopologuesDict: A dictionary with keys giving mass selections (“M1”, “M2”, etc.) and values of dataFrames giving the isotopologues for that mass selection.
+molecularDataFrame: The site-specific dataFrame, i.e. the original input
+GJ: A boolean; if true, looks in the M1Results dictionary for GJ results, rather than NUMPY results.
+disableProgress: A boolean; if True, disables progress bar.
+UMNSub: A list of strings; the strings correspond to isotopes (‘13C’, ‘15N’) used to calculate the U^M+1 value. Care needs to be taken–if certain isotopologues corresponding to these substitutions are not fully constrained, the routine will fail. This is one reason why it is important to check with a synthetic dataset first, to ensure the procedure works! A later update of this code should check automatically to see if this fails.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>processedResults: A dictionary, containing lists of the results from every Monte Carlo solution for many variables of interest.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.processMNMonteCarloResults">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">processMNMonteCarloResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UValuesSmp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNDictStd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UMNSub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disableProgress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.processMNMonteCarloResults" title="Link to this definition">¶</a></dt>
+<dd><p>Given solutions from the GJ solver monte carlo routine and a dataFrame listing which isotopologues correspond to each solution, calculates M+N Relative abundances. Then perturbs and applies a UMN value and calculates deltas and clumped deltas. Stores these values in a dictionary for statistics to be run on them.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>MNKey: A string, “M2”
+results: A dictionary containing the results of the Monte Carlo
+UValuesSmp: A dictionary where keys are isotopes and values are dictionaries; the interior keys are
+“Observed” and “Error”.
+dataFrame: A dataFrame with the isotopologues corresponding to each of the GJ solutions.
+molecularDataFrame: A dataframe with basic information about the sites of the molecule.
+MNDictStd: A dictionary, where keys are MN Keys and values are dataframes containing the isotopologues and their concentrations for the calculated standard.
+UMNSub: A list of substitutions to use to calculate the UMN values.
+disableProgress: Set True to disable tqdm progress bar</p>
+</dd>
+<dt>Outputs:</dt><dd><p>processedResults: A dictionary containing values for several important measures from each Monte Carlo
+run.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.replaceNA">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">replaceNA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.replaceNA" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.sanitizeMatrix">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">sanitizeMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.sanitizeMatrix" title="Link to this definition">¶</a></dt>
+<dd><p>One inefficient attempt to avoid floating point errors. This checks every entry of a matrix to see if it is sufficiently close to some integer value. If it is, it rounds it to that integer. This is useful to run on matrices that have been manipulated and may be carrying floating point errors.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>M: The matrix to sanitize.
+eps: A float. Entries with absolute value less than eps will be made 0.
+full: A boolean. If true, sanitizes all columns. If false, does not sanitize the final (augmented) column. This only works with AugAmount = 1 in GJElim, something to be improved in the future.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>M: The sanitized matrix.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.stringMeansAndStds">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">stringMeansAndStds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processedResults</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.stringMeansAndStds" title="Link to this definition">¶</a></dt>
+<dd><p>Used to calculate means and standard deviations for the M+N routine, after running Monte Carlo and storing the results in processed results. Both the “Deltas” and “Clumped Deltas” have “N/A” in addition to numerical results, so need some extra processing in order to deal with these strings. This function does that, changing those entries to np.nan and then calculating means and standard deviations.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>key: “Deltas” or “Clumped Deltas”, for the thing one wants to run statistics on.
+processedResults: A dictionary with the results of each monte carlo run.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>A tuple, giving the means and standard deviations for the key of interest.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.updateMNMonteCarloResults">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">updateMNMonteCarloResults</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processedResults</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.updateMNMonteCarloResults" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the dataFrame containing the GJ Solution with the results of the monte carlo routine. For each key in processed results, fills in the mean and standard deviation of the monte carlo runs.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>dataFrame: A dataframe containing the results of a single monte carlo run.
+processedResults: A dictionary containing the results of all monte carlo runs.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>dataFrame: The dataframe updated with results of the monte carlo runs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.updateRelClumpedDeltas">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">updateRelClumpedDeltas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MNSolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNDictStd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.updateRelClumpedDeltas" title="Link to this definition">¶</a></dt>
+<dd><p>Compute relative clumped deltas, rather than in the stochastic reference frame, for a M+N solution.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>MNSolution: A dataframe containing the M+N results in U Value space.
+MNKey: “M2”, “M3”, etc.
+MNDictStd: A dictionary, where keys are MN Keys and values are dataframes containing the isotopologues and their concentrations for the calculated standard.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>MNSolution: The same dataframe with relative clumped deltas added.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.solveSystem.updateSiteSpecificDfM1MC">
+<span class="sig-prename descclassname"><span class="pre">isotomics.solveSystem.</span></span><span class="sig-name descname"><span class="pre">updateSiteSpecificDfM1MC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processedResults</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.solveSystem.updateSiteSpecificDfM1MC" title="Link to this definition">¶</a></dt>
+<dd><p>Adds the processed M1MC results to the original dataframe.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>processedResults: A dictionary, containing lists of the results from every Monte Carlo solution for many variables of interest.
+molecularDataFrame: The site-specific dataFrame, i.e. the original input</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">isotomics</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basicDeltaOperations.html">isotomics.basicDeltaOperations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calcIsotopologues.html">isotomics.calcIsotopologues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataAnalyzerMNIsoX.html">isotomics.dataAnalyzerMNIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataScreenIsoX.html">isotomics.dataScreenIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fragmentAndSimulate.html">isotomics.fragmentAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="organizeData.html">isotomics.organizeData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readCSVAndSimulate.html">isotomics.readCSVAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readInput.html">isotomics.readInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveExperimentalData.html">isotomics.solveExperimentalData</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">isotomics.solveSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrumVis.html">isotomics.spectrumVis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">isotomics.quickstart</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API Reference</a><ul>
+      <li>Previous: <a href="solveExperimentalData.html" title="previous chapter">isotomics.solveExperimentalData</a></li>
+      <li>Next: <a href="spectrumVis.html" title="next chapter">isotomics.spectrumVis</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api/solveSystem.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "isotomics"
-version = "0.1.1"
+version = "0.1.0"
 description = "M+1 data processing and simulation for Orbitrap-IRMS fragmentation experiments"
 readme = "README.md"
 requires-python = ">=3.10.12"
@@ -34,6 +34,9 @@ dependencies = [
 test = [
   "pytest>=8.0",
 ]
+docs = [
+  "sphinx>=7.0",
+  "myst-parser>=2.0",]
 
 [project.scripts]
 isotomics-quickstart = "isotomics.quickstart:main"
@@ -44,5 +47,4 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 isotomics = ["input_data/**"]
-
 

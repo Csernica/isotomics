@@ -12,16 +12,28 @@ STD_Rs = {"H": 0.00015576, "C": 0.011180, "N": 0.003676, "17O": 0.0003799, "18O"
          "33S":0.007877,"34S":0.0441626,"36S":0.000105274}
     
 def deltaToConcentration(atomIdentity,delta):
-    '''
-    Converts an input delta value for a given type of atom in some reference frame to a 4-tuple containing the concentration of the unsubstituted, M+1, M+2, and all other versions of the atom. For atoms with multiple rare isotopes, sets the additional isotopes following a mass-scaling law. 
-    
-    Inputs:
-        atomIdentity: A string giving the isotope of interest. Note "S" gives 33S. 
-        delta: The input delta value. See STD_Rs, above, for the standard ratios. 
-        
-    Outputs:
-        A 4-tuple giving the concentration vector for this delta value. The first entry gives the unsubstituted; successive entries give higher mass substitutions. E.g. for S the entries are (32S, 33S, 34S, 36S). 
-    '''
+    """
+    Convert a delta value into internal isotope concentrations.
+
+    For isotope systems with multiple rare isotopes (for example O and S),
+    additional isotope concentrations are set using the mass-scaling rules
+    used by Isotomics.
+
+    Args:
+        atomIdentity: Isotope key identifying the ratio system (for example,
+            ``"13C"``, ``"15N"``, ``"D"``, ``"17O"``, ``"33S"``).
+        delta: Delta value in per mil for the specified isotope system.
+
+    Returns:
+        tuple[float, float, float, float]:
+        Concentrations in internal isotope ordering:
+        ``(unsubstituted, M+1, M+2, M+3)``.
+        For systems with fewer than four components, unused entries are ``0``.
+
+    Example:
+        >>> deltaToConcentration("13C", -10)
+        (0.989052963984032, 0.010947036015968062, 0, 0)
+    """
     if type(delta) == tuple:
         return twoDeltasToConcentration(atomIdentity, delta)
     
@@ -88,16 +100,26 @@ def deltaToConcentration(atomIdentity,delta):
         raise Exception('Sorry, I do not know how to deal with ' + atomIdentity)
 
 def twoDeltasToConcentration(atomIdentity, deltaTuple):
-    '''
-    A special version of the deltaToConcentration function, for 17/18O or 33/34S, when both are constrained via experiment. In this case, we do not set the additional isotopes via a mass scaling law, and instead calculate explicitly.
-    
-    Inputs:
-        atomIdentity: "O" or "S", for oxygen or sulfur. 
-        deltaTuple: A 2-tuple. The first entry is 17O or 33S, the second is 18O or 34S. 
-        
-    Outputs: 
-        A 4-tuple giving the concentration vector for this delta value. The first entry gives the unsubstituted; successive entries give higher mass substitutions. E.g. for S the entries are (32S, 33S, 34S, 36S). 
-    '''
+    """
+    Convert paired delta constraints into isotope concentrations.
+
+    This variant handles systems where two deltas are explicitly constrained
+    (17/18O or 33/34S), instead of deriving the second via mass scaling.
+
+    Args:
+        atomIdentity: ``"O"`` or ``"S"``.
+        deltaTuple: Two-element tuple. First value is 17O or 33S delta;
+            second value is 18O or 34S delta.
+
+    Returns:
+        tuple[float, float, float, float]:
+        Concentration vector for the isotope system.
+        For sulfur, ordering is ``(32S, 33S, 34S, 36S)``.
+
+    Example:
+        >>> twoDeltasToConcentration("O", (-10, -20))
+        (0.9976642714007893, 0.00037522253013810825, 0.001960506069072605, 0)
+    """
     if atomIdentity == 'O':
         delta17 = deltaTuple[0]
         delta18 = deltaTuple[1]
@@ -129,28 +151,37 @@ def twoDeltasToConcentration(atomIdentity, deltaTuple):
         return (s32,s33,s34,s36)
     
 def concentrationToM1Ratio(concentrationTuple):
-    '''
-    Gives the ratio for the mass 1 rare isotope of an atom.
-    
-    Inputs:
-        concentrationTuple: A 4-tuple giving the concentration vector for this delta value. The first entry gives the unsubstituted; successive entries give higher mass substitutions. E.g. for S the entries are (32S, 33S, 34S, 36S). 
-        
-    Outputs:
-        A float, giving the ratio between the mass 1 isotope and the unsubstituted isotope. 
-    '''
+    """
+    Compute the M+1-to-unsubstituted ratio from a concentration vector.
+
+    Args:
+        concentrationTuple: Four-element concentration vector in the internal
+            isotope ordering.
+
+    Returns:
+        float: Ratio of the mass-1 isotope to the unsubstituted isotope.
+
+    Example:
+        >>> concentrationToM1Ratio((0.989052963984032, 0.010947036015968062, 0, 0))
+        0.0110682
+    """
     return concentrationTuple[1]/concentrationTuple[0] 
 
 def ratioToDelta(atomIdentity, ratio):
-    '''
-    Converts an input ratio for a given atom to a delta value.
-    
-    Inputs:
-        atomIdentity: A string giving the isotope of interest
-        ratio: The isotope ratio.
-        
-    outputs: 
-        delta: The delta value for that isotope and ratio.
-    '''
+    """
+    Convert an isotope ratio into a delta value.
+
+    Args:
+        atomIdentity: Isotope key of interest.
+        ratio: Isotope ratio relative to the unsubstituted isotope.
+
+    Returns:
+        float: Delta value for the provided isotope ratio.
+
+    Example:
+        >>> ratioToDelta("13C", 0.0110682)
+        -10.000000000000009
+    """
     delta = 0
     if atomIdentity == 'D':
         atomIdentity = 'H'
@@ -180,17 +211,23 @@ def ratioToDelta(atomIdentity, ratio):
     return delta
 
 def compareRelDelta(atomID, deltaStd, deltaSmp):
-    '''
-    Given at atom ID and two deltas in CRF space, finds their relative difference (not in CRF space). This is useful for making sample standard comparisons. 
-    
-    Inputs:
-        atomID: A string, to be fed to deltaToConcentration
-        deltaStd: The delta value of the "standard" (denominator)
-        deltaSmp: The delta value of the "sample" (numerator)
-        
-    Outputs:
-        relDelta: The delta value of the sample relative to the standard.
-    '''
+    """
+    Compute sample-relative-to-standard delta in CRF space.
+
+    This comparison accounts for non-additivity of delta values.
+
+    Args:
+        atomID: Isotope key passed to :func:`deltaToConcentration`.
+        deltaStd: Delta value of the standard (denominator).
+        deltaSmp: Delta value of the sample (numerator).
+
+    Returns:
+        float: Sample-relative-to-standard delta value.
+
+    Example:
+        >>> compareRelDelta("13C", -10, -20)
+        -10.101010101010166
+    """
     rStd = concentrationToM1Ratio(deltaToConcentration(atomID,deltaStd))
     rSmp = concentrationToM1Ratio(deltaToConcentration(atomID,deltaSmp))
 

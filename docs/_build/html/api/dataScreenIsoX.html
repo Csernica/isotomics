@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>isotomics.dataScreenIsoX &#8212; isotomics  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="isotomics.fragmentAndSimulate" href="fragmentAndSimulate.html" />
+    <link rel="prev" title="isotomics.dataAnalyzerMNIsoX" href="dataAnalyzerMNIsoX.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-isotomics.dataScreenIsoX">
+<span id="isotomics-datascreenisox"></span><h1>isotomics.dataScreenIsoX<a class="headerlink" href="#module-isotomics.dataScreenIsoX" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataScreenIsoX.RSESNScreen">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataScreenIsoX.</span></span><span class="sig-name descname"><span class="pre">RSESNScreen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rtnAllFilesDF</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNRelativeAbundance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataScreenIsoX.RSESNScreen" title="Link to this definition">¶</a></dt>
+<dd><p>Screen all peaks and print any which have RSE/SN &gt; threshold</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>rtnAllFilesDf: A dataframe containing all of the output ratios, from dataAnalyzerMN.calc_Folder_Output</p>
+</dd>
+<dt>Outputs:</dt><dd><p>None. Prints flags for peaks that exceed the threshold.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataScreenIsoX.getThisSubMass">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataScreenIsoX.</span></span><span class="sig-name descname"><span class="pre">getThisSubMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subKey</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataScreenIsoX.getThisSubMass" title="Link to this definition">¶</a></dt>
+<dd><p>Given a subKey, like ‘13C’, (or ‘D-13C’, split by ‘-’, for multiple substitutions), get the mass change relative to no substitutions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataScreenIsoX.internalStabilityScreenSubsequence">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataScreenIsoX.</span></span><span class="sig-name descname"><span class="pre">internalStabilityScreenSubsequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNRelativeAbundance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priorSubsequenceLength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">testSubsequenceLength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholdConstant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataScreenIsoX.internalStabilityScreenSubsequence" title="Link to this definition">¶</a></dt>
+<dd><p>Screens all peaks for subsequence outlier detection; prints those that fail.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>folderPath: The directory containing the .txt or .csv files from FTStatistic.
+fragmentDict: A dictionary containing information about the fragments and substitutions present in the FTStat output file.
+fragmentMostAbundant: A list giving the most abundant peak in each fragment.
+mergedList: A list of lists; each outer list corresponds to a file, each inner list to a fragment; elements of this inner list are dataframes giving the scans and data for that fragment of that file.
+MNRelativeAbundance: Whether to calculate results as MN Relative Abundances or ratios.
+fileExt: The file extension of the FTStat output file, either ‘.txt’ or ‘.csv’
+subsequenceLength: The length of the subsequence to use.
+thresholdConstant: A constant to multiply by to determine the appropriate threshold for screening.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>No output; prints the identity of any file failing the test.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataScreenIsoX.peakDriftScreen">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataScreenIsoX.</span></span><span class="sig-name descname"><span class="pre">peakDriftScreen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataScreenIsoX.peakDriftScreen" title="Link to this definition">¶</a></dt>
+<dd><p>Check each peak to determine if it has drifted relative to the most abundant isotope. Threshold is the amount of drift (in ppm) required to raise a warning.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataScreenIsoX.subsequenceOutlierDetection">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataScreenIsoX.</span></span><span class="sig-name descname"><span class="pre">subsequenceOutlierDetection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeSeries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priorSubsequenceLength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">testSubsequenceLength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataScreenIsoX.subsequenceOutlierDetection" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the anomaly score for a timeseries and a given subsequence length.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>timeSeries: A univariate time series, i.e. a pandas series.
+subsequenceLength: The length of the subsequence to use..</p>
+</dd>
+<dt>Outputs:</dt><dd><p>allDev: The euclidian distance between the subsequence of interest and the mean of the previous subsequenceLength observations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataScreenIsoX.visualizeTICVersusTime">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataScreenIsoX.</span></span><span class="sig-name descname"><span class="pre">visualizeTICVersusTime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mergedDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targetRatio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'13C/Unsub'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scan_averaging_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataScreenIsoX.visualizeTICVersusTime" title="Link to this definition">¶</a></dt>
+<dd><p>Visualize the TIC versus time for a single file in the merged dict.</p>
+<p>targetRatio can be:
+- a ratio like ‘13C/Unsub’
+- a MN relative abundance like ‘MN Relative Abundance 13C’
+- a bare substitution like ‘13C’ (will be interpreted as MN Relative Abundance)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataScreenIsoX.zeroCountsScreen">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataScreenIsoX.</span></span><span class="sig-name descname"><span class="pre">zeroCountsScreen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataScreenIsoX.zeroCountsScreen" title="Link to this definition">¶</a></dt>
+<dd><p>Iterates through all peaks and prints those with zero counts higher than a certain relative threshold.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>folderPath: The directory containing the .txt or .csv files from FTStatistic.
+fragmentDict: A dictionary containing information about the fragments and substitutions present in the FTStat output file.
+mergedList: A list of lists; each outer list corresponds to a file, each inner list to a fragment; elements of this inner list are dataframes giving the scans and data for that fragment of that file.
+fileExt: The file extension of the FTStat output file, either ‘.txt’ or ‘.csv’
+threshold: The relative number of zero scans to look for</p>
+</dd>
+<dt>Outputs:</dt><dd><p>None. Prints the name of peaks with more than the threshold number of zero scans.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">isotomics</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basicDeltaOperations.html">isotomics.basicDeltaOperations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calcIsotopologues.html">isotomics.calcIsotopologues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataAnalyzerMNIsoX.html">isotomics.dataAnalyzerMNIsoX</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">isotomics.dataScreenIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fragmentAndSimulate.html">isotomics.fragmentAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="organizeData.html">isotomics.organizeData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readCSVAndSimulate.html">isotomics.readCSVAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readInput.html">isotomics.readInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveExperimentalData.html">isotomics.solveExperimentalData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveSystem.html">isotomics.solveSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrumVis.html">isotomics.spectrumVis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">isotomics.quickstart</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API Reference</a><ul>
+      <li>Previous: <a href="dataAnalyzerMNIsoX.html" title="previous chapter">isotomics.dataAnalyzerMNIsoX</a></li>
+      <li>Next: <a href="fragmentAndSimulate.html" title="next chapter">isotomics.fragmentAndSimulate</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api/dataScreenIsoX.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

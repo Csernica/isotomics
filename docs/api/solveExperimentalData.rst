@@ -1,0 +1,7 @@
+isotomics.solveExperimentalData
+===============================
+
+.. automodule:: isotomics.solveExperimentalData
+   :members:
+   :undoc-members:
+   :show-inheritance:

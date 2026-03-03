@@ -10,8 +10,6 @@ from . import basicDeltaOperations as op
 
 '''                                                 
 This code calculates a dictionary giving all possible isotopologues of a molecule and their concentrations, based on input information about the sites and their isotopic composition.                                                 
-                                                                                                                      
-The theory for this section is developed in the working M+N paper. Contact Tim for details (tcsernic@caltech.edu).
 
 It assumes one has access to a dataframe specifying details about a molecule. See the tutorial.
 '''
@@ -20,16 +18,50 @@ It assumes one has access to a dataframe specifying details about a molecule. Se
 setsOfElementIsotopes = {'H':(0,1),'N':(0,1),'C':(0,1),'O':(0,1,2),'S':(0,1,2,4)}
 
 def calculateSetsOfSiteIsotopes(molecularDataFrame):
-    '''
-    Every site has some set of possible isotopes. For single-atomic sites, this is equal to the set of element isotopes value for the relevant element. For multiatomic sites, it is given by a multinomial expansion of the set of element isotopes. For example, a nitrogen site with 2 atoms can have (00), (01), or (11) as possible isotopes. The number of ways to make these combinations are 1, 2, and 1 respectively. This function calculates the possible substitutions and multinomial coefficients. 
-    
-    Inputs:
-        molecularDataFrame: A dataFrame containing information about the molecule.
-        
-    Outputs: 
-        setsOfSiteIsotopes: A list of tuples, where tuple i gives the possible combinations of substitutions at site i. 
-        multinomialCoefficients: A list of tuples, where tuple i gives the multinomial coefficients of substitutions at site i. 
-    '''
+    """
+    Compute the isotope combinations and multinomial coefficients for each site.
+
+    The dataframe divides the molecule into sites, each containing indistinguishable
+    atoms. A site may be indistinguishable in principle (e.g., symmetry) or in
+    practice (e.g., fragmentation). For single-atom sites, the possible isotopes
+    are the element isotopes. For multi-atom sites, the possible isotope states
+    are generated from combinations with replacement.
+
+    In this notation, substitutions are encoded as tuples. For example, a
+    two-carbon site is represented as ``((0, 0), (0, 1), (1, 1))``, where
+    ``0`` corresponds to 12C and ``1`` corresponds to 13C.
+
+    Args:
+        molecularDataFrame (pandas.DataFrame): Molecule definition table with at
+            least ``'IDS'`` (element symbol per site) and ``'Number'`` (atoms per
+            site) columns.
+
+    Returns:
+        tuple[list, list]:
+            - setsOfSiteIsotopes: Tuple/list structure where item ``i`` contains
+              the allowed isotope combinations at site ``i``.
+            - multinomialCoefficients: Tuple/list structure where item ``i``
+              contains multinomial multiplicities matching
+              ``setsOfSiteIsotopes[i]``.
+
+    Example:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({
+        ...     'Site Names': ['Calphabeta', 'Ccarboxyl', 'Ocarboxyl', 'Namine', 'Hretained', 'Hlost'],
+        ...     'IDS': ['C', 'C', 'O', 'N', 'H', 'H'],
+        ...     'Number': [2, 1, 2, 1, 6, 2],
+        ... })
+        >>> sets_of_site_isotopes, multinomial_coefficients = ci.calculateSetsOfSiteIsotopes(molecular_df)
+
+        Example output (abridged)::
+
+            sets_of_site_isotopes[0]
+            ((0, 0), (0, 1), (1, 1))
+
+            multinomial_coefficients[0]
+            [[1, 1], [2, 2], [1, 1]]
+    """
     elIDs = molecularDataFrame['IDS'].values
     numberAtSite = molecularDataFrame['Number'].values
 
@@ -81,17 +113,41 @@ def calculateSetsOfSiteIsotopes(molecularDataFrame):
     return setsOfSiteIsotopes, multinomialCoefficients
 
 def calcAllIsotopologues(setsOfSiteIsotopes, multinomialCoefficients, M1Only = False):
-    '''
-    Compute all isotopologues of a molecule. For much larger molecules (>1 million isotopologues), we will want to avoid this step and instead just calculate the MN populations we are most interested in. 
-    
-    Inputs:
-        setsOfSiteIsotopes: A list of tuples, where tuple i gives the possible combinations of substitutions at site i. 
-        multinomialCoefficients: A list of tuples, where tuple i gives the multinomial coefficients of substitutions at site i. 
-        
-    Outputs: 
-        setOfAllIsotopologues: A list of tuples, where each tuple is an isotopologue of a molecule.
-        symmetryNumbers: A list of ints, where int i gives the number of ways to construct isotopologue i. Follows same indexing as setOfAllIsotopologues. 
-    '''
+    """
+    This takes in both a set of site isotopes and a set of multinomial coefficients, which are the outputs of calculateSetsOfSiteIsotopes. You take those outputs and feed them directly into here. Then this function generates the set of all isotopologues and their symmetry numbers. 
+
+    For large systems, set ``M1Only=True`` to compute only the unsubstituted and
+    M+1 isotopologues. (My personal computer runs out of storage around 10 million isotopoplogues).
+
+    Args:
+        setsOfSiteIsotopes (list[tuple]): Site-level isotopes from
+            :func:`calculateSetsOfSiteIsotopes`.
+        multinomialCoefficients (list[tuple]): Site-level multiplicities from
+            :func:`calculateSetsOfSiteIsotopes`.
+        M1Only (bool, optional): If ``True``, return only unsubstituted and M+1
+            isotopologues. Defaults to ``False``.
+
+    Returns:
+        tuple[list[tuple], list[int]]:
+            - setOfAllIsotopologues: Isotopologue tuple per molecular state.
+            - symmetryNumbers: Multiplicity for each isotopologue, same order as
+              ``setOfAllIsotopologues``.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'IDS': ['C', 'C'], 'Number': [2, 1], 'deltas': [0, 0]})
+        >>> sets_of_site_isotopes, multinomial_coefficients = ci.calculateSetsOfSiteIsotopes(molecular_df)
+        >>> isotopologues, symmetry_numbers = ci.calcAllIsotopologues(sets_of_site_isotopes, multinomial_coefficients, M1Only=True)
+        >>> isotopologues, symmetry_numbers
+        ([((0, 0), 0),
+        ((0, 0), 1),
+        ((0, 1), 0),
+        ((0, 1), 1),
+        ((1, 1), 0),
+        ((1, 1), 1)],
+        [1, 1, 2, 2, 1, 1])
+    """
     if M1Only:
         setOfM1Isotopologues, symmetryNumbers = calcThroughM1Isotopologues(setsOfSiteIsotopes)
         return setOfM1Isotopologues, symmetryNumbers
@@ -113,16 +169,26 @@ def calcAllIsotopologues(setsOfSiteIsotopes, multinomialCoefficients, M1Only = F
     return setOfAllIsotopologues, symmetryNumbers
 
 def calcThroughM1Isotopologues(setsOfSiteIsotopes):
-    '''
-    A workaround to compute only the M1 population of isotopologues (and the unsubstituted isotopologue). This will speed calculation for M+1 experiments. Variants could be written for M+2, M+3, etc.; this is a future goal. 
-    
-    Inputs:
-        setsOfSiteIsotopes: A list of tuples, where tuple i gives the possible combinations of substitutions at site i. 
-        
-    Outputs: 
-        setOfAllIsotopologues: A list of tuples, where each tuple is an isotopologue of a molecule.
-        symmetryNumbers: A list of ints, where int i gives the number of ways to construct isotopologue i. Follows same indexing as setOfAllIsotopologues. 
-    '''
+    """
+    This is a reduced alternative to :func:`calcAllIsotopologues` for that only calculates through the M+1 isotopologues. Way faster and avoids memory issues if all you are doing is a M+1 experiment. Typically called by :func:`calcAllIsotopologues` with M1Only = True rather than directly. 
+
+    Args:
+        setsOfSiteIsotopes (list[tuple]): Site-level isotopes from
+            :func:`calculateSetsOfSiteIsotopes`.
+
+    Returns:
+        tuple[list[tuple], list[int]]:
+            - setOfM1Isotopologues: Unsubstituted isotopologue plus M+1 entries.
+            - symmetryNumbers: Multiplicity for each isotopologue.
+
+    Examples:
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'IDS': ['C','C'], 'Number': [2,1], 'deltas': [0,0]})
+        >>> sets_of_site_isotopes, multinomial_coefficients = ci.calculateSetsOfSiteIsotopes(molecular_df)
+        >>> isotopologues, symmetry_numbers = ci.calcThroughM1Isotopologues(sets_of_site_isotopes)
+        >>> isotopologues, symmetry_numbers
+        ([[(0, 0), 0], ((0, 1), 0), ((0, 0), 1)], [1, 2, 1])
+    """
     symmetryNumbers = []
     setOfM1Isotopologues = []
     unsubstitutedIsotopologue = []
@@ -166,17 +232,28 @@ def calcThroughM1Isotopologues(setsOfSiteIsotopes):
     return setOfM1Isotopologues, symmetryNumbers
 
 def siteSpecificConcentrations(molecularDataFrame):
-    '''
-    Calculates all site-specific concentrations and puts them in an array for easy access. Note that at present, it only works for C,N,O,S,H. If we add new elements, we may need to play with the structure of this function. 
-    
-    The basic structure of the array is: array[i][j] gives the concentration of an isotope with cardinal mass difference i at position j. 
-    
-    Inputs:
-        molecularDataFrame: A dataFrame containing information about the molecule.
-        
-    Outputs:
-        concentrationArray: A numpy array giving the concentration of each isotope at each site. 
-    '''
+    """
+    Convert per-site deltas into isotope concentration arrays.
+
+    The output structure is indexed by cardinal mass difference: entry ``i``
+    contains concentrations for substitutions of mass ``M+i`` at each site.
+
+    Args:
+        molecularDataFrame (pandas.DataFrame): Molecule definition table with
+            ``'IDS'``, ``'Number'``, and ``'deltas'`` columns.
+
+    Returns:
+        tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]:
+            Arrays for M0, M1, M2, M3, and M4 site concentrations, respectively.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'IDS': ['C', 'N'], 'Number': [1, 1], 'deltas': [-10, 0]})
+        >>> concentration_array = ci.siteSpecificConcentrations(molecular_df)
+        >>> [arr.shape for arr in concentration_array]
+        [(2,), (2,), (2,), (2,), (2,)]
+    """
     elIDs = molecularDataFrame['IDS'].values
     numberAtSite = molecularDataFrame['Number'].values
     deltas = molecularDataFrame['deltas'].values
@@ -206,22 +283,48 @@ def siteSpecificConcentrations(molecularDataFrame):
     return concentrationArray
 
 def calculateIsotopologueConcentrations(setOfAllIsotopologues, symmetryNumbers, concentrationArray, disable = False):
-    '''
-    Puts information about the isotopologues of a molecule, their symmetry numbers, and concentrations of individual isotopes together in order to calculate the concentration of each isotopologue. Does so under the stochastic assumption, i.e. assuming that isotopes are distributed stochastically across all isotopologues.
-    
-    This is a computationally expensive step--ways to improve would be welcome. For molecules where it is too expensive, it would be expedient to avoid calculating all isotopologues and only calculate the M1, M2, etc populations of interest. 
-    
-    Inputs:
-        setOfAllIsotopologues: A list of tuples, where each tuple is an isotopologue of a molecule.
-        symmetryNumbers: A list of ints, where int i gives the number of ways to construct isotopologue i. Follows same indexing as setOfAllIsotopologues. 
-        concentrationArray: A numpy array giving the concentration of each isotope at each site. 
-        disable: Disables the tqdm progress bar if True. 
-        
-    Outputs:
-        d: A dictionary where the keys are string representations of each isotopologue and the values are dictionaries. For example, a string could be '00100', where there is an M1 substitution at position 2 and M0 isotopes at all other sites. The value dictionaries include "Conc", or concentration, and "num", giving the number of isotopologues of that form. The sum of all concentrations should be 1.  
-        
-        The keys can be "expanded" strings, i.e. including multiple atomic sites in parentheses. For example, N1/N2 and O3 would appear as (0,1)0. 
-    '''
+    """
+    Compute concentrations for each isotopologue in the setOfAllIsotopologues based on the site-specific concentrations and assuming stochasticitiy. 
+
+    For isotopologues with symmetry numbers greater than 1, the computed concentration sums across all versions of that isotopologue. Therefore, the sum of the concentrations in the output should be 1. 
+
+    Args:
+        setOfAllIsotopologues (list[tuple]): Isotopologue tuples.
+        symmetryNumbers (list[int]): Multiplicity for each isotopologue.
+        concentrationArray (tuple[numpy.ndarray, ...]): Output of
+            :func:`siteSpecificConcentrations`.
+        disable (bool, optional): If ``True``, hide tqdm progress bars.
+            Defaults to ``False``.
+
+    Returns:
+        dict[str, dict]: Mapping from isotopologue string representation to a
+        record with:
+
+            - ``'Conc'``: concentration of that isotopologue class.
+            - ``'num'``: symmetry number / multiplicity.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'IDS': ['C','C'], 'Number': [2,1], 'deltas': [0,0]})
+        >>> sets_of_site_isotopes, multinomial_coefficients = ci.calculateSetsOfSiteIsotopes(molecular_df)
+        >>> isotopologues, symmetry_numbers = ci.calcAllIsotopologues(sets_of_site_isotopes, multinomial_coefficients)
+        >>> concentration_array = ci.siteSpecificConcentrations(molecular_df)
+        >>> d = ci.calculateIsotopologueConcentrations(isotopologues, symmetry_numbers, concentration_array, disable=True)
+        >>> d
+        {'(0, 0)0': {'Conc': 0.9671962109820917, 'num': 1},
+            '(0, 0)1': {'Conc': 0.010813253638779786, 'num': 1},
+            '(0, 1)0': {'Conc': 0.021626507277559572, 'num': 2},
+            '(0, 1)1': {'Conc': 0.00024178435136311605, 'num': 2},
+            '(1, 1)0': {'Conc': 0.00012089217568155803, 'num': 1},
+            '(1, 1)1': {'Conc': 1.3515745241198188e-06, 'num': 1}}
+
+        >>> s = 0 
+        >>> for i, v in d.items():
+        ...     s += v['Conc']
+        >>> s
+        0.9999999999999999
+    """
     d = {}
     for i, isotopologue in enumerate(tqdm(setOfAllIsotopologues, disable = disable)):
         number = symmetryNumbers[i]
@@ -243,15 +346,23 @@ def calculateIsotopologueConcentrations(setOfAllIsotopologues, symmetryNumbers, 
     return d
 
 def condenseStr(text):
-    '''
-    Takes the "expanded" string depictions, i.e. "(0,1)0" for multiatomic sites and transforms them into "ATOM" depictions, i.e. "010". This makes it easy to pick out the element for a particular substitution by finding the index of the ATOM depiction and looking at that same index in strSiteElements. 
-    
-    Inputs:
-        text: A string, the "expanded" string depiction. 
-        
-    Outputs:
-        text: A string, the "ATOM" string depiction. 
-    '''
+    """
+    Convert expanded isotopologue strings to ATOM strings.
+
+    Expanded strings for multi-atom sites (for example ``"(0,1)0"``) are
+    flattened to ATOM-style strings (for example ``"010"``).
+
+    Args:
+        text (str): Expanded isotopologue string.
+
+    Returns:
+        str: Condensed ATOM string.
+
+    Examples:
+        >>> from isotomics import calcIsotopologues as ci
+        >>> ci.condenseStr('(0,1)0')
+        '010'
+    """
     text = text.replace('(', '')
     text = text.replace(')', '')
     text = text.replace(',', '')
@@ -260,16 +371,25 @@ def condenseStr(text):
     return text
  
 def uEl(el, n):
-    '''
-    Returns the type of substitution, given a chemical element and cardinal mass of isotope.
-    
-    Inputs:
-        el: A string, giving the element of interest
-        n: An int, giving the cardinal mass of the isotope
-        
-    Returns: 
-        A string identifying the isotope substitution. 
-    '''
+    """
+    Map an element and cardinal mass shift to substitution label.
+
+    Args:
+        el (str): Element symbol (``'C'``, ``'H'``, ``'N'``, ``'O'``, or ``'S'``).
+        n (int | str): Cardinal mass shift. ``0`` or ``'x'`` returns an empty
+            string.
+
+    Returns:
+        str: Substitution label (for example ``'13C'`` or ``'18O'``), or an empty
+        string for unsubstituted positions.
+
+    Examples:
+        >>> from isotomics import calcIsotopologues as ci
+        >>> ci.uEl('C', 1)
+        '13C'
+        >>> ci.uEl('C', 0)
+        ''
+    """
     if n == 0:
         return ''
     if n == 'x':
@@ -297,15 +417,26 @@ def uEl(el, n):
             return '36S'
 
 def strSiteElements(molecularDataFrame):
-    '''
-    Our dataframe may include multiatomic sites--for example, we may define site N1/N2 to include two nitrogens and site O3 to have one oxygen. It is useful to have a string where we can index in by position--i.e. "NNO"--to determine the chemical element at a given position. This function defines that string. 
-    
-    Inputs:
-        molecularDataFrame: A dataFrame containing information about the molecule.
-        
-    Outputs: 
-        siteElements: A string giving the chemical element by position, expanding multiatomic sites. 
-    '''
+    """
+    Expand site elements into an atom-position string.
+
+    For a molecular table with multi-atom sites, this returns a string where each
+    atom position is represented explicitly (for example ``"NNO"``).
+
+    Args:
+        molecularDataFrame (pandas.DataFrame): Molecule definition table with
+            ``'IDS'`` and ``'Number'`` columns.
+
+    Returns:
+        str: Expanded element string by atomic position.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'IDS': ['N', 'O'], 'Number': [2, 1]})
+        >>> ci.strSiteElements(molecular_df)
+        'NNO'
+    """
     elIDs = molecularDataFrame['IDS'].values
     numberAtSite = molecularDataFrame['Number'].values
 
@@ -316,27 +447,31 @@ def strSiteElements(molecularDataFrame):
     return siteElements
 
 def calcAtomDictionary(isotopologueConcentrationDict, molecularDataFrame, disable = False):
-    '''
-    Given the dictionary from calculateIsotopologueConcentrations, calculates another dictionary with more complete information. Takes the "expanded" string depictions i.e. "(0,1)0" to "ATOM" depictions i.e. "010" and makes these the keys. Stores the expanded depictions, number, and concentration for each isotopologue, then additionally calculates their mass and relevant substitutions. 
-    
-    Computationally expensive; 20 seconds for methionine.
-    
-    An example entry from methionine for the unsubstituted isotopologue is shown below:  
-    
-    '000000000000000000000': {'Number': 1,
-      'full': '00(0, 0)00000(0, 0, 0)(0, 0)(0, 0, 0)(0, 0)00',
-      'Conc': 0.8906400439358315,
-      'Mass': 0,
-      'Subs': ''}
-      
-    Inputs: 
-        isotopologueConcentrationDict: The output from calculateIsotopologueConcentrations. 
-        molecularDataFrame: A dataFrame containing information about the molecule.
-        disable: Disables the tqdm progress bar if True
-        
-    Outputs: 
-        byAtom: A new dictionary containing more complete information about the isotopologues. 
-    '''
+    """
+    Build an isotopologue dictionary keyed by ATOM strings.
+
+    Converts isotopologue keys from expanded notation to ATOM notation and adds
+    derived metadata including total mass shift and substitution labels.
+
+    Args:
+        isotopologueConcentrationDict (dict): Output of
+            :func:`calculateIsotopologueConcentrations`.
+        molecularDataFrame (pandas.DataFrame): Molecule definition table.
+        disable (bool, optional): If ``True``, hide tqdm progress bars.
+            Defaults to ``False``.
+
+    Returns:
+        dict[str, dict]: Dictionary keyed by ATOM string. Each value includes
+        ``'Number'``, ``'Full'``, ``'Conc'``, ``'Mass'``, and ``'Subs'``.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'Site Names': ['C1'], 'IDS': ['C'], 'Number': [1], 'deltas': [0]}).set_index('Site Names')
+        >>> by_atom = ci.inputToAtomDict(molecular_df, disable=True)
+        >>> sorted(by_atom.keys())
+        ['0', '1']
+    """
     siteElements = strSiteElements(molecularDataFrame)
     
     byAtom = {}
@@ -352,41 +487,35 @@ def calcAtomDictionary(isotopologueConcentrationDict, molecularDataFrame, disabl
     return byAtom
 
 def calcSubDictionary(isotopologueConcentrationDict, molecularDataFrame, atomInput = False):
-    '''
-    Similar to the "byAtom" dictionary, a more complete depiction of all isotopologues of a molecule. In this case, rather than index in by ATOM string, index in by substitution--i.e., the key '17O' gives information for all isotopologues with the substituion '17O'. This is a better way to index into this information for certain mass spectrometry experiments, e.g. a molecular average measurement of the ratio between two substitutions. 
-    
-    This "bySub" dictionary can be calculated directly from the isotopologueConcentrationDict, or from a precalculated ATOM dictionary. 
-    
-    Computationally expensive; 20 seconds for methionine. 
-    
-    An example entry from methionine is shown below.
-    
-    'D': {'Number': 12,
-      'Full': ['00(0, 0)00000(0, 0, 0)(0, 0)(0, 0, 0)(0, 0)01',
-       '00(0, 0)00000(0, 0, 0)(0, 0)(0, 0, 0)(0, 0)10',
-       '00(0, 0)00000(0, 0, 0)(0, 0)(0, 0, 0)(0, 1)00',
-       '00(0, 0)00000(0, 0, 0)(0, 0)(0, 0, 1)(0, 0)00',
-       '00(0, 0)00000(0, 0, 0)(0, 1)(0, 0, 0)(0, 0)00',
-       '00(0, 0)00000(0, 0, 1)(0, 0)(0, 0, 0)(0, 0)00'],
-      'Conc': 0.0015953500722996194,
-      'Mass': [1, 1, 1, 1, 1, 1],
-      'ATOM': ['000000000000000000001',
-       '000000000000000000010',
-       '000000000000000000100',
-       '000000000000000010000',
-       '000000000000010000000',
-       '000000000001000000000']},
-       
-    'ATOM' gives the list of all ATOM strings with this substitution. 
-      
-    Inputs: 
-        isotopologueConcentrationDict: The output from calculateIsotopologueConcentrations or a "byAtom" dictionary.
-        molecularDataFrame: A dataFrame containing information about the molecule.
-        atomInput: Specifies whether the input dictionary is the output of calculateIsotopologueConcentrations or a "byAtom" dictionary
-        
-    Outputs: 
-        bySub: A new dictionary containing giving the same information as the ATOM dictionary but indexed via substitution. 
-    '''
+    """
+    Build an isotopologue dictionary keyed by substitution pattern.
+
+    This reorganizes isotopologue information so entries are keyed by substitution
+    labels (for example ``'D'`` or ``'13C-15N'``) rather than ATOM strings.
+
+    Args:
+        isotopologueConcentrationDict (dict): Either the output of
+            :func:`calculateIsotopologueConcentrations` (default mode) or a
+            precomputed by-atom dictionary (``atomInput=True``).
+        molecularDataFrame (pandas.DataFrame): Molecule definition table.
+        atomInput (bool, optional): If ``True``, interpret
+            ``isotopologueConcentrationDict`` as by-atom input. Defaults to
+            ``False``.
+
+    Returns:
+        dict[str, dict]: Dictionary keyed by substitution string. Each value
+        includes aggregated ``'Number'``, ``'Full'``, ``'Conc'``, ``'Mass'``, and
+        ``'ATOM'`` fields.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'Site Names': ['C1'], 'IDS': ['C'], 'Number': [1], 'deltas': [0]}).set_index('Site Names')
+        >>> by_atom = ci.inputToAtomDict(molecular_df, disable=True)
+        >>> by_sub = ci.calcSubDictionary(by_atom, molecular_df, atomInput=True)
+        >>> '13C' in by_sub
+        True
+    """
     siteElements = strSiteElements(molecularDataFrame)
     if atomInput == False:
         bySub = {}
@@ -416,17 +545,32 @@ def calcSubDictionary(isotopologueConcentrationDict, molecularDataFrame, atomInp
     return bySub
 
 def inputToAtomDict(molecularDataFrame, disable = False, M1Only = False):
-    '''
-    A function wrapper to combine several of the basic tasks leading to construction of the isotopologue dictionary. If you are trying to understand how this works, run each of these functions individually. 
-    
-    Inputs:
-        molecularDataFrame: A dataFrame containing information about the molecule.
-        disable: If True, disables tqdm progress bars for the dictionary calculations (which can be time-intensive). 
-        M1Only: If True, only calculates the M+1 population. 
-    
-    Outputs: 
-        byAtom: A dictionary where keys are "ATOM strings" (i.e. '0000100010') corresponding to different isotopologues and values are dictionaries, listing information about the concentration, number, composition, etc. of those isotopologues. 
-    '''
+    """
+    Run the full pipeline from molecular input to by-atom dictionary.
+
+    This is a convenience wrapper around:
+    ``calculateSetsOfSiteIsotopes`` -> ``calcAllIsotopologues`` ->
+    ``siteSpecificConcentrations`` -> ``calculateIsotopologueConcentrations`` ->
+    ``calcAtomDictionary``.
+
+    Args:
+        molecularDataFrame (pandas.DataFrame): Molecule definition table.
+        disable (bool, optional): If ``True``, hide tqdm progress bars.
+            Defaults to ``False``.
+        M1Only (bool, optional): If ``True``, compute only unsubstituted and M+1
+            isotopologues. Defaults to ``False``.
+
+    Returns:
+        dict[str, dict]: By-atom isotopologue dictionary.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'Site Names': ['C1', 'N1'], 'IDS': ['C', 'N'], 'Number': [1, 1], 'deltas': [0, 0]}).set_index('Site Names')
+        >>> by_atom = ci.inputToAtomDict(molecular_df, disable=True, M1Only=True)
+        >>> len(by_atom)
+        3
+    """
     if disable == False:
         print("Calculating Isotopologue Concentrations")
     siteElements = strSiteElements(molecularDataFrame)
@@ -442,16 +586,26 @@ def inputToAtomDict(molecularDataFrame, disable = False, M1Only = False):
     return byAtom
 
 def massSelections(atomDictionary, massThreshold = 4):
-    '''
-    Pulls out M0, M1, etc. populations from the ATOM dictionary, up to specified threshold. Packages them into a dictionary, where keys are "M0", "M1", etc. and values are dictionaries giving the isotopologues associated with that population. 
-    
-    Inputs:
-        atomDictionary: A dictionary with information about all isotopologues, keyed by ATOM strings. The output of calcAtomDictionary.
-        massThreshold: An int. Does not include populations with cardinal mass difference above this threshold. 
-        
-    Outputs:
-        A dictionary where the keys are "M0", "M1", etc. and the values are dictionaries containing all isotopologues from the ATOM dictionary with a specified cardinal mass difference. 
-    '''
+    """
+    Partition a by-atom dictionary into M0..Mn mass selections.
+
+    Args:
+        atomDictionary (dict[str, dict]): Output of :func:`calcAtomDictionary`.
+        massThreshold (int, optional): Highest mass class to include. Defaults to
+            ``4``.
+
+    Returns:
+        dict[str, dict]: Dictionary with keys ``'M0'`` ... ``'M{massThreshold}'``;
+        each value contains isotopologues from that mass class.
+
+    Examples:
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'Site Names': ['C1'], 'IDS': ['C'], 'Number': [1], 'deltas': [0]}).set_index('Site Names')
+        >>> by_atom = ci.inputToAtomDict(molecular_df, disable=True)
+        >>> sorted(ci.massSelections(by_atom, massThreshold=1).keys())
+        ['M0', 'M1']
+    """
     MNDict = {}
     
     for i in range(massThreshold+1):
@@ -465,20 +619,33 @@ def massSelections(atomDictionary, massThreshold = 4):
     return MNDict
 
 def introduceClump(clumpD, siteList, clumpAmount, molecularDataFrame):
-    '''
-    Introduce a clump between any number of sites while keeping the site-specific concentrations the same. This is a complicated operation--we must add concentration to the clumped isotopologue, remove it from the singly-substituted isotopologues, and add it to the unsubstituted isotopologue.
-    
-    Note--this function only works for mass 1 substitutions. A more general function should be built for mass 2, 3, etc. 
-    
-    Inputs:
-        clumpD: a "byAtom" dictionary including all isotopologues.
-        siteList: A list of sites to introduce a clump at, e.g. ['Cmethyl','Cgamma']
-        clumpAmount: The amount, in concentration space (not CAP Delta), of the clump to introduce. 
-        molecularDataFrame: The initial molecular info dataFrame. 
-        
-    Outputs:
-        clumpD: A byAtom dictionary with the clump added.
-    '''
+    """
+    Introduce a mass-1 clump while preserving site-specific abundances.
+
+    The function increases the concentration of the selected clumped isotopologue,
+    decreases the relevant singly substituted isotopologues, and adjusts the
+    unsubstituted isotopologue to conserve totals.
+
+    Args:
+        clumpD (dict[str, dict]): By-atom isotopologue dictionary.
+        siteList (list[str]): Site names to clump (for example
+            ``['Cmethyl', 'Cgamma']``).
+        clumpAmount (float): Clump amount in concentration space (not CAP Delta).
+        molecularDataFrame (pandas.DataFrame): Molecule definition table.
+
+    Returns:
+        dict[str, dict]: Updated by-atom dictionary including the clump.
+
+    Examples:
+        >>> import copy
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'Site Names': ['C1', 'C2'], 'IDS': ['C', 'C'], 'Number': [1, 1], 'deltas': [0, 0]}).set_index('Site Names')
+        >>> stoch = ci.inputToAtomDict(molecular_df, disable=True)
+        >>> clumped = ci.introduceClump(copy.deepcopy(stoch), ['C1', 'C2'], 1e-6, molecular_df)
+        >>> clumped['11']['Conc'] > stoch['11']['Conc']
+        True
+    """
     siteNameList = []
 
     siteName = molecularDataFrame.index
@@ -514,18 +681,27 @@ def introduceClump(clumpD, siteList, clumpAmount, molecularDataFrame):
     return clumpD
 
 def checkClumpDelta(siteList, molecularDataFrame, clumpD, stochD):
-    '''
-    Checks the CAP Delta value for substitutions at some set of sites and prints these. 
-    
-    Inputs:
-        siteList: A list of sites to introduce a clump at, e.g. ['Cmethyl','Cgamma']
-        molecularDataFrame: The initial molecular info dataFrame. 
-        clumpD: a "byAtom" dictionary with the clumps added.
-        stochD: A "byAtom" dictionary without the clumps present. 
-        
-    Outputs:
-        None. Prints the size of the clump at the input sites. 
-    '''
+    """
+    Print CAP Delta for a specified clump relative to stochastic abundance.
+
+    Args:
+        siteList (list[str]): Site names defining the clump.
+        molecularDataFrame (pandas.DataFrame): Molecule definition table.
+        clumpD (dict[str, dict]): By-atom dictionary with clump applied.
+        stochD (dict[str, dict]): Baseline stochastic by-atom dictionary.
+
+    Returns:
+        None: Prints the CAP Delta value for the requested clump.
+
+    Examples:
+        >>> import copy
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> molecular_df = pd.DataFrame({'Site Names': ['C1', 'C2'], 'IDS': ['C', 'C'], 'Number': [1, 1], 'deltas': [0, 0]}).set_index('Site Names')
+        >>> stoch = ci.inputToAtomDict(molecular_df, disable=True)
+        >>> clumped = ci.introduceClump(copy.deepcopy(stoch), ['C1', 'C2'], 1e-6, molecular_df)
+        >>> ci.checkClumpDelta(['C1', 'C2'], molecular_df, clumped, stoch)
+    """
     siteNameList = []
 
     siteName = molecularDataFrame.index

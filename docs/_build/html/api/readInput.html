@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>isotomics.readInput &#8212; isotomics  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="isotomics.solveExperimentalData" href="solveExperimentalData.html" />
+    <link rel="prev" title="isotomics.readCSVAndSimulate" href="readCSVAndSimulate.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-isotomics.readInput">
+<span id="isotomics-readinput"></span><h1>isotomics.readInput<a class="headerlink" href="#module-isotomics.readInput" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readInput.checkSampleStandard">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readInput.</span></span><span class="sig-name descname"><span class="pre">checkSampleStandard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standard</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readInput.checkSampleStandard" title="Link to this definition">¶</a></dt>
+<dd><p>A useful feature for checking that sample and standard measurements include the same observations. This can be run when using actual data or using experimental data with fractionation factors which may cause certain beams to be unobserved. In the latter case, passing these peaks to the omitMeasurements option of simulateMeasurement will help.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>sample: Observed data for the sample
+standard: Observed data for the standard</p>
+</dd>
+<dt>Outputs:</dt><dd><p>None. Prints which peaks are observed in one dataset but not the other.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readInput.readComputedData">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readInput.</span></span><span class="sig-name descname"><span class="pre">readComputedData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSONInput</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readInput.readComputedData" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a .json file saved from a computed dataset, extracts the M+N information, and processes it to get ready to solve the M+N measurement. Allows the user to specify some amount of relative experimental error (e.g. 1 per mil) for all observed beams. For standards, includes the predicted measurements in the abscence of resolution, abundance, fractionation, etc. errors.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>JSONInput: The .json dictionary to input.
+error: The relative error to assign to each observed peak. Either an int/float, in which case it is the same for all observed peaks, or a dictionary, in which the relative error of each peak is set individually. If it is a dictionary, it is keyed via ‘massSelection’ then ‘fragKey’ then ‘subKey’, e.g. error = {‘M1’:{‘44’:{‘13C’:0.001,’2H’:0.005,’15N’:0.002}}}
+theory: A dictionary giving the predicted measurement in the abscence of any experimental errors. This is used to standardize in later steps. If the input is a Sample, should be left empty.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>process: A dictionary giving the processed .json file. Each fragment of each mass selection has a dictionary, specifying the substitutions, their observed abundances and errors, and for standards only, their predicted abundances.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readInput.readComputedUValues">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readInput.</span></span><span class="sig-name descname"><span class="pre">readComputedUValues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSONInput</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UMNSub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'13C'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readInput.readComputedUValues" title="Link to this definition">¶</a></dt>
+<dd><p>Takes a .json file from a computed dataset, extracts the full molecule U Values, and packages them into a dictionary. Allows the user to specify the relative error for each U value.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>JSONInput: The .json dictionary to input.
+error: The relative error to assign to each observed peak.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>U Values: A dictionary specifying the molecular average U values and their errors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readInput.readJSON">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readInput.</span></span><span class="sig-name descname"><span class="pre">readJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readInput.readJSON" title="Link to this definition">¶</a></dt>
+<dd><p>A basic function wrapper to read in a JSON file.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>filepath: A string, pointing to the .json file of interest.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary of the .json file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>read</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readInput.readObservedData">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readInput.</span></span><span class="sig-name descname"><span class="pre">readObservedData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sampleOutputDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNKey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'M1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standard</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processFragKeys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readInput.readObservedData" title="Link to this definition">¶</a></dt>
+<dd><p>Process an observed .json file, where keys are files, then fragments, then isotopes, into the “processStandard” or “processSample” input dictionaries. Standardization (by adding predicted values to the dictionary) may or may not be performed; we determine this by setting a list, standard, which is true or false for each file in order.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>sampleOutputDict: A processed .json file containing experimental data.
+MNKey: “M1”, “M2”, etc.
+theory: Predicted measurements for a standard.
+standard: A list of booleans, determining whether each file (in order) is a standard or a sample.
+processFragKeys: A dictionary. Keys are the fragment Keys assigned to the data in the experimental file; values are the same in the theory data. E.g. {‘134.0’:’133’}</p>
+</dd>
+<dt>Outputs:</dt><dd><p>process: A dictionary, containing the experimental data processed into the “processStandard” or “processSample” forms, ready for the MC algorithm.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">isotomics</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basicDeltaOperations.html">isotomics.basicDeltaOperations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calcIsotopologues.html">isotomics.calcIsotopologues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataAnalyzerMNIsoX.html">isotomics.dataAnalyzerMNIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataScreenIsoX.html">isotomics.dataScreenIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fragmentAndSimulate.html">isotomics.fragmentAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="organizeData.html">isotomics.organizeData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readCSVAndSimulate.html">isotomics.readCSVAndSimulate</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">isotomics.readInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveExperimentalData.html">isotomics.solveExperimentalData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveSystem.html">isotomics.solveSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrumVis.html">isotomics.spectrumVis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">isotomics.quickstart</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API Reference</a><ul>
+      <li>Previous: <a href="readCSVAndSimulate.html" title="previous chapter">isotomics.readCSVAndSimulate</a></li>
+      <li>Next: <a href="solveExperimentalData.html" title="next chapter">isotomics.solveExperimentalData</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api/readInput.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

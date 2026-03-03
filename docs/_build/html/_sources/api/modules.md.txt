@@ -1,0 +1,21 @@
+# Modules
+
+```{automodule} isotomics.readCSVAndSimulate
+:members:
+:undoc-members:
+```
+
+```{automodule} isotomics.dataAnalyzerMNIsoX
+:members:
+:undoc-members:
+```
+
+```{automodule} isotomics.solveExperimentalData
+:members:
+:undoc-members:
+```
+
+```{automodule} isotomics.solveSystem
+:members:
+:undoc-members:
+```

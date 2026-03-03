@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>isotomics.readCSVAndSimulate &#8212; isotomics  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="isotomics.readInput" href="readInput.html" />
+    <link rel="prev" title="isotomics.organizeData" href="organizeData.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-isotomics.readCSVAndSimulate">
+<span id="isotomics-readcsvandsimulate"></span><h1>isotomics.readCSVAndSimulate<a class="headerlink" href="#module-isotomics.readCSVAndSimulate" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readCSVAndSimulate.addClumps">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readCSVAndSimulate.</span></span><span class="sig-name descname"><span class="pre">addClumps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byAtom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clumpD</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readCSVAndSimulate.addClumps" title="Link to this definition">¶</a></dt>
+<dd><p>A function which adjusts the abundances of target isotopologues to include clumps.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>byAtom: A dictionary where keys are isotoplogues and values are dictionaries containing details about those isotopologues.
+molecularDataFrame: A dataframe containing basic information about the molecule.
+clumpD: Specifies information about clumps to add; otherwise the isotome follows the stochastic assumption. Currently works only for mass 1 substitutions (e.g. 1717, 1317, etc.) See ci.introduceClump for details.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>byAtom: The same dictionary, with concentrations modified to include clumps.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readCSVAndSimulate.extractExperimentalErrors">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readCSVAndSimulate.</span></span><span class="sig-name descname"><span class="pre">extractExperimentalErrors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errorPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UValueError</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNError</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readCSVAndSimulate.extractExperimentalErrors" title="Link to this definition">¶</a></dt>
+<dd><p>Read in error bars from a user provided csv. If no CSV is provided, instead return a single float giving error for the molecular average measurement (U Value) and for the M+N Experiment. A value of 0.001 corresponds to a 1 per mil error.</p>
+<dl>
+<dt>Inputs:</dt><dd><p>errorPath: Path to the CSV.
+UValueError: A float giving the error on the U Value. Only used if no errorPath provided.
+MNError: A float giving the error on the M+N measurements. Only used if no errorPath provided.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>UValueErrors, MNErrors: Dictionaries. UValueErrors looks like: {‘13C’:0.0001}, while MNErrors looks like: {‘M1’:{‘44’:{‘15N’:0.002,’13C’:0.001,’Unsub’:0.001}}}</p>
+<p>Alternatively:
+UValueError, MNError: The same as the inputs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readCSVAndSimulate.moleculeFromCsv">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readCSVAndSimulate.</span></span><span class="sig-name descname"><span class="pre">moleculeFromCsv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragSubset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readCSVAndSimulate.moleculeFromCsv" title="Link to this definition">¶</a></dt>
+<dd><p>Reads in a .csv file to get basic information about that molecule.</p>
+<dl>
+<dt>Inputs:</dt><dd><p>path: a string locating the .csv, e.g. ‘Example Input.csv’
+fragSubset: A list of fragments to include. Defaults to None, in which case it is filled programatically to contain all fragments.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>initializedMolecule: A dictionary, containing:</p>
+<blockquote>
+<div><p>molecularDataFrame: A dataframe containing basic information about the molecule.
+expandedFrags: An ATOM depiction of each fragment, where an ATOM depiction has one entry for each atom (rather than for each site). See fragmentAndSimulate for details.
+fragSubgeometryKeys: A list of strings, e.g. 44_01, 44_02, corresponding to each subgeometry of each fragment. A fragment will have multiple subgeometries if there are multiple fragmentation pathways to form it.
+fragmentationDictionary: A dictionary like the allFragments variable, but only including the subset of fragments selected by fragSubset.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readCSVAndSimulate.otherFragmentReps">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readCSVAndSimulate.</span></span><span class="sig-name descname"><span class="pre">otherFragmentReps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fragmentationDictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readCSVAndSimulate.otherFragmentReps" title="Link to this definition">¶</a></dt>
+<dd><p>Computes alternative representations of the fragments for easier processing.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>fragmentationDictionary: A dictionary specifying the fragments and their geometries</p>
+</dd>
+<dt>Outputs:</dt><dd><p>expandedFrags: An ATOM depiction of each fragment, where an ATOM depiction has one entry for each atom (rather than for each site). See fragmentAndSimulate for details.
+fragSubgeometryKeys: A list of strings, e.g. 44_01, 44_02, corresponding to each subgeometry of each fragment. A fragment will have multiple subgeometries if there are multiple fragmentation pathways to form it.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readCSVAndSimulate.plotOutput">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readCSVAndSimulate.</span></span><span class="sig-name descname"><span class="pre">plotOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulationOutput</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relativeDeltasActual</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readCSVAndSimulate.plotOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Simple function to plot the output of a simulation.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>simulationOutput: A dataframe containing the results of a M+1 simulation. returned by simulateSmpStd.
+relativeDeltasActual: A list, giving the actual delta values for the sample standard comparison. The ordering of the list should be the same as the indices of simulationOutput. If “None”, do not plot these.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>None. Constructs a plot.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readCSVAndSimulate.process_fragment_column">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readCSVAndSimulate.</span></span><span class="sig-name descname"><span class="pre">process_fragment_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragSubset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fragmentationDictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renameCols</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readCSVAndSimulate.process_fragment_column" title="Link to this definition">¶</a></dt>
+<dd><p>Read and process a single fragment column. Helper function for moleculeFromCsv.</p>
+<dl>
+<dt>Inputs:</dt><dd><p>col: A string, format like ‘Fragment 44’ or ‘Fragment 44_01’.
+fragSubset: A list of fragment names, like [‘44’,’full’]
+molecularDf: The molecular DataFrame
+fragmentationDictionary: A dictionary specifying the fragments and their geometries
+renameCols: A dictionary, where keys are the column names in the input csv and values are new desired column names for the molecular Dataframe</p>
+</dd>
+<dt>Outputs:</dt><dd><p>fragmentationDictionary, molecularDf, renameCols</p>
+<p>All as above, but either filled with more information for frags in fragSubset (fragmentationDictionary and renameCols) or with information removed (molecularDf, if there are fragments not in ‘fragSubset’).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readCSVAndSimulate.simulateMeasurement">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readCSVAndSimulate.</span></span><span class="sig-name descname"><span class="pre">simulateMeasurement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initializedMolecule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abundanceThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UValueList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">massThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clumpD</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputPath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disableProgress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calcFF</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fractionationFactors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omitMeasurements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffstd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unresolvedDict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputFull</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readCSVAndSimulate.simulateMeasurement" title="Link to this definition">¶</a></dt>
+<dd><p>Simulates M+N measurements of an alanine molecule with input deltas specified by the input dataframe molecularDataFrame.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>molecularDataFrame: A dataframe containing basic information about the molecule.
+expandedFrags: An ATOM depiction of each fragment, where an ATOM depiction has one entry for each atom (rather than for each site). See fragmentAndSimulate for details.
+fragSubgeometryKeys: A list of strings, e.g. 44_01, 44_02, corresponding to each subgeometry of each fragment. A fragment will have multiple subgeometries if there are multiple fragmentation pathways to form it.
+fragmentationDictionary: A dictionary like the allFragments variable, but only including the subset of fragments selected by fragSubset.
+abundanceThreshold: A float; Does not include measurements below this M+N relative abundance, i.e. assuming they will not be  measured due to low abundance.
+UValueList: A list giving specific substitutions to calculate molecular average U values for (‘13C’, ‘15N’, etc.)
+massThreshold: An integer; will calculate M+N relative abundances for N &lt;= massThreshold
+clumpD: Specifies information about clumps to add; otherwise the isotome follows the stochastic assumption. Currently works only for mass 1 substitutions (e.g. 1717, 1317, etc.) See ci.introduceClump for details.
+outputPath: A string, e.g. ‘output’, or None. If it is a string, outputs the simulated spectrum as a json.
+disableProgress: Disables tqdm progress bars when True.
+calcFF: When True, computes a new set of fractionation factors for this measurement.
+fractionationFactors: A dictionary, specifying a fractionation factor to apply to each ion beam. This is used to apply fractionation factors calculated previously to this predicted measurement (e.g. for a sample/standard comparison with the same experimental fractionation)
+omitMeasurements: omitMeasurements: A dictionary, {}, specifying measurements which I will not observed. For example, omitMeasurements = {‘M1’:{‘61’:’D’}} would mean I do not observe the D ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance.
+ffstd: A float; if new fractionation factors are calculated, they are pulled from a normal distribution centered around 1, with this standard deviation.
+unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other.
+outputFull: A boolean. Typically False, in which case beams that are not observed are culled from the dictionary. If True, includes this information; this should only be used for debugging, and will likely break the solver routine.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>predictedMeasurement: A dictionary giving information from the M+N measurements.
+MN: A dictionary where keys are mass selections (“M1”, “M2”) and values are dictionaries giving information about the isotopologues of each mass selection.
+fractionationFactors: The calculated fractionation factors for this measurement (empty unless calcFF == True)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.readCSVAndSimulate.simulateSmpStd">
+<span class="sig-prename descclassname"><span class="pre">isotomics.readCSVAndSimulate.</span></span><span class="sig-name descname"><span class="pre">simulateSmpStd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltasStd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltasSmp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltasStdAppx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abundanceThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UValueList</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">massThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disableProgress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calcFF</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omitMeasurements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffstd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MonteCarloN</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbTheoryOAmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errorPath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNError</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UValueError</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resultsFileName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output.csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputPrecision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">UMNSub</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'13C'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.readCSVAndSimulate.simulateSmpStd" title="Link to this definition">¶</a></dt>
+<dd><p>Parent function which constructs and runs a full sample standard comparison.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>path: The path to a CSV file containing data about a molecule.
+deltaStd: Delta values for the standard, used in the simulation.
+deltaSmp: Delta values for the sample used in the simulation.
+deltasStdAppx: Delta values for the approximation of the standard used for the forward model of the standard.
+abundanceThreshold, UValueList, massThreshold, disableProgress, calcFF, omitMeasurements, ffstd: Inputs to simulateMeasurement. See that function for documentation.
+plot: Construct a plot showing the comparison.
+MonteCarloN, perturbTheoryOAmt: Used to run the Monte Carlo routine; see ss.M1MonteCarlo.
+errorPath: The path to a CSV containing information about the experimental errors.
+MNError: IF no errorPath, then use this value for the error on every observed fragment.
+UValueError: IF no errorPath, use this value for the error on the molecular average measurement.
+resultsFileName: Name the output CSV.
+outputPrecision: Adjust precision on the output CSV.
+UMNSub: Choose which isotope to anchor to when calculating site-specific data.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>simulationOutput: A dataframe containing the results of the simulation. Also produces a cleaned CSV containing the most relevant pieces of information. Also plots these data (if plot).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">isotomics</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basicDeltaOperations.html">isotomics.basicDeltaOperations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calcIsotopologues.html">isotomics.calcIsotopologues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataAnalyzerMNIsoX.html">isotomics.dataAnalyzerMNIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataScreenIsoX.html">isotomics.dataScreenIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fragmentAndSimulate.html">isotomics.fragmentAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="organizeData.html">isotomics.organizeData</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">isotomics.readCSVAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readInput.html">isotomics.readInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveExperimentalData.html">isotomics.solveExperimentalData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveSystem.html">isotomics.solveSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrumVis.html">isotomics.spectrumVis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">isotomics.quickstart</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API Reference</a><ul>
+      <li>Previous: <a href="organizeData.html" title="previous chapter">isotomics.organizeData</a></li>
+      <li>Next: <a href="readInput.html" title="next chapter">isotomics.readInput</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api/readCSVAndSimulate.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

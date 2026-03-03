@@ -68,3 +68,13 @@ Csernica, Timothy and Zeichner, Sarah S. (2026).
 Csernica/isotomics.
 
 
+
+## Documentation
+
+Build docs locally:
+
+```bash
+pip install -e .[docs]
+cd docs
+make.bat
+```

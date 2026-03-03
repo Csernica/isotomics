@@ -1,0 +1,7 @@
+# isotomics.readInput
+
+```{automodule} isotomics.readInput
+:members:
+:undoc-members:
+:show-inheritance:
+```

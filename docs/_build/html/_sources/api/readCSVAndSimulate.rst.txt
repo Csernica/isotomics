@@ -1,0 +1,7 @@
+isotomics.readCSVAndSimulate
+============================
+
+.. automodule:: isotomics.readCSVAndSimulate
+   :members:
+   :undoc-members:
+   :show-inheritance:

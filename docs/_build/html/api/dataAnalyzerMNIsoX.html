@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>isotomics.dataAnalyzerMNIsoX &#8212; isotomics  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="isotomics.dataScreenIsoX" href="dataScreenIsoX.html" />
+    <link rel="prev" title="isotomics.calcIsotopologues" href="calcIsotopologues.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-isotomics.dataAnalyzerMNIsoX">
+<span id="isotomics-dataanalyzermnisox"></span><h1>isotomics.dataAnalyzerMNIsoX<a class="headerlink" href="#module-isotomics.dataAnalyzerMNIsoX" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.calc_Append_Ratios">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">calc_Append_Ratios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subNameList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mostAbundant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.calc_Append_Ratios" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the ratios for each combination of substitutions. Calculates all ratios in the order such that they are &lt; 1.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>mergedDf: A dataframe with all information for a single file.
+subNameList: A list of substitution names, e.g. [‘13C’,’18O’,’D’]</p>
+</dd>
+<dt>Outputs:</dt><dd><p>mergedDf: The same dataframe with ratios added.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.calc_Folder_Output">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">calc_Folder_Output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isoXFilePaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smpStdOrdering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cullOn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cullAmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanNumber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeBounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNRelativeAbundance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RSESNScreen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeroCountsScreen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeroCountsThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peakDriftScreen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peakDriftThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.calc_Folder_Output" title="Link to this definition">¶</a></dt>
+<dd><p>Calculates the output for many isoX files (NOT combined.isox. Files should be processed individually).</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>isoXFilePaths: A list of .isox files, including both standard and sample files, to read in.
+smpStdOrdering: A user specified list which explicitly indicates whether each file is a sample or standard.
+cullOn:
+cullAmt:
+debug:
+cullByTime:
+scanNumber:
+timeBounds:
+MNRelativeAbundance:</p>
+</dd>
+<dt>Outputs:</dt><dd><p>Two different versions of the output. These are:
+rtnAllFilesDF: A dataframe containing the processed data means, stdevs, serrs, rses, and SN.
+mergedDict: A dictionary, containing ‘subNameList’ (metadata used in computations) and ‘mergedDf’, a dataframe containing the scan-by-scan data for that file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.calc_MN_Rel_Abundance">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">calc_MN_Rel_Abundance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subNameList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.calc_MN_Rel_Abundance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.calculate_Counts_And_ShotNoise">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">calculate_Counts_And_ShotNoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peakDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CN</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.calculate_Counts_And_ShotNoise" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate counts of each scan peak</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>peakDf: An individual dataframe consisting of a single peak extracted by FTStatistic.
+CN: A factor from the 2017 paper to convert intensities into counts
+resolution: A reference resolution, for the same purpose (do not change!)
+z: The charge of the ion, used to convert intensities into counts
+Microscans: The number of scans a cycle is divided into, typically 1.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>The inputDF, with a column for ‘counts’ added.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.combine_Substituted_Peaks">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">combine_Substituted_Peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">splitDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cullOn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cullAmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanNumber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeBounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNRelativeAbundance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.combine_Substituted_Peaks" title="Link to this definition">¶</a></dt>
+<dd><p>splitDf: A Pandas groupBy object; can be iterated through; iterations give tuples of isotopolog strings (‘D’,’M0’, etc.) and dataframes corresponding to the data for that substitution.
+cullByTime: If True, only include data within certain set of timepoints (by scan # or retTime)
+scanNumber: If True &amp; cullByTime is True, then cull based on scan #. OTherwise, cull by retTime.
+timeBounds: A tuple; the retTime or scanNumber limits to use.
+MNRelativeAbundance: Calculate MN Relative Abundances rather than ratios.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.cull_By_Time">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">cull_By_Time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeBounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanNumber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.cull_By_Time" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.findMostAbundantSub">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">findMostAbundantSub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subNameList</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.findMostAbundantSub" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.folderOutputToDict">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">folderOutputToDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rtnAllFilesDF</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNRelativeAbundance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.folderOutputToDict" title="Link to this definition">¶</a></dt>
+<dd><p>takes the output dataframe and processes to a dictionary, for .json output</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.output_Raw_File_MN_Rel_Abundance">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">output_Raw_File_MN_Rel_Abundance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subNameList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">massStr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.output_Raw_File_MN_Rel_Abundance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.output_Raw_File_Ratios">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">output_Raw_File_Ratios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mergedDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subNameList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mostAbundant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">massStr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omitRatios</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNRelativeAbundance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.output_Raw_File_Ratios" title="Link to this definition">¶</a></dt>
+<dd><p>For each ratio of interest, calculates mean, stdev, SErr, RSE, and ShotNoise based on counts.
+Outputs these in a dictionary which organizes by fragment (i.e different entries for fragments at 119 and 109).</p>
+<dl>
+<dt>Inputs:</dt><dd><p>df: A list of merged data frames from the _combineSubstituted function. Each dataframe constitutes one fragment.
+isotopeList: A list of isotopes corresponding to the peaks extracted by FTStat, in the order they were extracted.</p>
+<blockquote>
+<div><p>This must be the same for each fragment. This is used to determine all ratios of interest, i.e. 13C/UnSub, and label them in the proper order.</p>
+</div></blockquote>
+<p>omitRatios: A list of ratios to ignore. I.e. by default, the script will report 13C/15N ratios, which one may not care about.
+weightByNLHeight: Used to say whether to weight by NL height or not. Tim: 20210330: Added this as the weightByNLHeight does not yet work with M+N routines.
+debug: Set false to suppress print output
+percentAbundance: Optionally calculate the percent abundance within each fragment, for M+N experiments.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>A dictionary giving mean, stdev, StandardError, relative standard error, and shot noise limit for all peaks.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.prepareDataForM1">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">prepareDataForM1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rtnMeans</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.prepareDataForM1" title="Link to this definition">¶</a></dt>
+<dd><p>Processes the data from rtnMeans into a format that can be read into the M+1 algorithm.</p>
+<dl>
+<dt>Inputs:</dt><dd><p>rtnMeans: A dataframe containing information about the mean sample and standard values for each isotope of each fragment. The output of processIndividualAndAverageIsotopeRatios.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>forM1Algo: A dictionary, structured like {‘Std’:{‘44’:’13C’:{‘Average’:avg,      StdDev’:std,’StdError’:stderr,’RelStdError’:rse,’ShotNoise’:SN
+}}}</p>
+<p>The parent dictionary contains ‘Std’ and ‘Smp’. The final dictionary contains data about that acquisition.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.processIndividualAndAverageIsotopeRatios">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">processIndividualAndAverageIsotopeRatios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fragmentFolderPaths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cwd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputToCSV</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">csvOutputPath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output.csv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.isox'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed_data_subfolder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Input</span> <span class="pre">Data'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RSESNScreen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeroCountsScreen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeroCountsThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peakDriftScreen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peakDriftThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.processIndividualAndAverageIsotopeRatios" title="Link to this definition">¶</a></dt>
+<dd><p>Process statistics on isox files and output processed data results. Prepare data to run M+1 model. If you have multiple input files, it will take their average relative standard error and divide this by the square root of the number of files to use for future computations.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>fragmentFolderPaths: A list of strings representing the paths of subfolders within the main folder. Output of organizeData.get_subfolder_paths()
+cwd: The current working directory.
+outputToCSV: If True, output the processed data as a .csv.
+csvOutputPath: Specifies the output path for that .csv.
+file_extension: The extension of the input data files. Should be .isox.
+processed_data_subfolder: Directory name for processed data.
+acquisition_length: Cull by time, within these bounds.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>rtnMeans: A dataframe containing information about the mean sample and standard values for each isotope of each fragment.
+rtnMergedDict: A dictionary, where keys are fileNames, and values are dictionaries. The inner dictionaries contain ‘subNameList’ (metadata used in computations) and ‘mergedDf’, a dataframe containing the scan-by-scan data for that file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.processIsoXDf">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">processIsoXDf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">IsoXDf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cullOn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cullAmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanNumber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeBounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">MNRelativeAbundance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.processIsoXDf" title="Link to this definition">¶</a></dt>
+<dd><p>Takes in the IsoXDataframe; splits it based on filename. For each filename, combines the data from all substitutions into a single dataframe. Adds these dataframes to an output list.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>IsoXDf: A dataframe with the data from the .csv output.</p>
+</dd>
+<dt>Outputs:</dt><dd><p>mergedList: mergedList, is a list of dataframes. Each dataframe corresponds to one file &amp; has all information about each scan on a single line.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.readIsoX">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">readIsoX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.readIsoX" title="Link to this definition">¶</a></dt>
+<dd><p>Read in the ‘combined’ output from isoX; rename &amp; drop columns as desired.</p>
+<dl class="simple">
+<dt>Inputs:</dt><dd><p>fileName: A string; the name of the file (‘combined.isox’)</p>
+</dd>
+<dt>Outputs:</dt><dd><p>IsoXDf: A dataframe with the data from the .csv output.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.dataAnalyzerMNIsoX.setDualInletTimes">
+<span class="sig-prename descclassname"><span class="pre">isotomics.dataAnalyzerMNIsoX.</span></span><span class="sig-name descname"><span class="pre">setDualInletTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">startDeadObsReps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.dataAnalyzerMNIsoX.setDualInletTimes" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">isotomics</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basicDeltaOperations.html">isotomics.basicDeltaOperations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calcIsotopologues.html">isotomics.calcIsotopologues</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">isotomics.dataAnalyzerMNIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataScreenIsoX.html">isotomics.dataScreenIsoX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fragmentAndSimulate.html">isotomics.fragmentAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="organizeData.html">isotomics.organizeData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readCSVAndSimulate.html">isotomics.readCSVAndSimulate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readInput.html">isotomics.readInput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveExperimentalData.html">isotomics.solveExperimentalData</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solveSystem.html">isotomics.solveSystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectrumVis.html">isotomics.spectrumVis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">isotomics.quickstart</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting.html">Troubleshooting</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">API Reference</a><ul>
+      <li>Previous: <a href="calcIsotopologues.html" title="previous chapter">isotomics.calcIsotopologues</a></li>
+      <li>Next: <a href="dataScreenIsoX.html" title="next chapter">isotomics.dataScreenIsoX</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/api/dataAnalyzerMNIsoX.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
