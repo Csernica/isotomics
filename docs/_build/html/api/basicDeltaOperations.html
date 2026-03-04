@@ -36,62 +36,13 @@
   <section id="module-isotomics.basicDeltaOperations">
 <span id="isotomics-basicdeltaoperations"></span><h1>isotomics.basicDeltaOperations<a class="headerlink" href="#module-isotomics.basicDeltaOperations" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="isotomics.basicDeltaOperations.compareRelDelta">
-<span class="sig-prename descclassname"><span class="pre">isotomics.basicDeltaOperations.</span></span><span class="sig-name descname"><span class="pre">compareRelDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltaStd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltaSmp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.basicDeltaOperations.compareRelDelta" title="Link to this definition">¶</a></dt>
-<dd><p>Compute sample-relative-to-standard delta in CRF space.</p>
-<p>This comparison accounts for non-additivity of delta values.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>atomID</strong> – Isotope key passed to <a class="reference internal" href="#isotomics.basicDeltaOperations.deltaToConcentration" title="isotomics.basicDeltaOperations.deltaToConcentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">deltaToConcentration()</span></code></a>.</p></li>
-<li><p><strong>deltaStd</strong> – Delta value of the standard (denominator).</p></li>
-<li><p><strong>deltaSmp</strong> – Delta value of the sample (numerator).</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Sample-relative-to-standard delta value.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">compareRelDelta</span><span class="p">(</span><span class="s2">&quot;13C&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">)</span>
-<span class="go">-10.101010101010166</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.basicDeltaOperations.concentrationToM1Ratio">
-<span class="sig-prename descclassname"><span class="pre">isotomics.basicDeltaOperations.</span></span><span class="sig-name descname"><span class="pre">concentrationToM1Ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concentrationTuple</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.basicDeltaOperations.concentrationToM1Ratio" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the M+1-to-unsubstituted ratio from a concentration vector.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>concentrationTuple</strong> – Four-element concentration vector in the internal
-isotope ordering.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Ratio of the mass-1 isotope to the unsubstituted isotope.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float</p>
-</dd>
-</dl>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">concentrationToM1Ratio</span><span class="p">((</span><span class="mf">0.989052963984032</span><span class="p">,</span> <span class="mf">0.010947036015968062</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-<span class="go">0.0110682</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="isotomics.basicDeltaOperations.deltaToConcentration">
 <span class="sig-prename descclassname"><span class="pre">isotomics.basicDeltaOperations.</span></span><span class="sig-name descname"><span class="pre">deltaToConcentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomIdentity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.basicDeltaOperations.deltaToConcentration" title="Link to this definition">¶</a></dt>
-<dd><p>Convert a delta value into internal isotope concentrations.</p>
-<p>For isotope systems with multiple rare isotopes (for example O and S),
-additional isotope concentrations are set using the mass-scaling rules
-used by Isotomics.</p>
+<dd><p>Converts a delta value for a particular atom into a tuple giving isotope concentration. The tuple is ordered: (M+0, M+1, M+2, M+4), and hardcoded to have 4 elements. For example for carbon, the tuple yields:</p>
+<p>([12C], [13C], 0, 0).</p>
+<p>Currently, this function accepts carbon, hydrogen, nitrogen, oxygen, and sulfur. The atomIdentity can be given as the element symbol (for example, <code class="docutils literal notranslate"><span class="pre">&quot;C&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;H&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;N&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;O&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;S&quot;</span></code>) or as the M+1 isotope <code class="docutils literal notranslate"><span class="pre">&quot;13C&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;D&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;15N&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;17O&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;33S&quot;</span></code>).</p>
+<p>For isotope systems with multiple rare isotopes (‘O’, or ‘S’), the delta value is assumed to be for the M+1 isotope (17O or 33S). The M+2 isotope is then derived via mass-scaling. For oxygen, the mass exponent is 0.52; for sulfur it is 0.515 (for 34S from 33S) and 1 / 1.9 (for 36S from 34S).</p>
+<p>For more precision with the oxygen and sulfur systems, you may provide paired delta values via <a class="reference internal" href="#isotomics.basicDeltaOperations.twoDeltasToConcentration" title="isotomics.basicDeltaOperations.twoDeltasToConcentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">twoDeltasToConcentration()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -117,9 +68,59 @@ For systems with fewer than four components, unused entries are <code class="doc
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="isotomics.basicDeltaOperations.twoDeltasToConcentration">
+<span class="sig-prename descclassname"><span class="pre">isotomics.basicDeltaOperations.</span></span><span class="sig-name descname"><span class="pre">twoDeltasToConcentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomIdentity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltaTuple</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.basicDeltaOperations.twoDeltasToConcentration" title="Link to this definition">¶</a></dt>
+<dd><p>A variant of <a class="reference internal" href="#isotomics.basicDeltaOperations.deltaToConcentration" title="isotomics.basicDeltaOperations.deltaToConcentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">deltaToConcentration()</span></code></a> used for oxygen and sulfur. This function takes multiple delta values and returns a concentration tuple. Note that 36S is still derived from 34S via mass-scaling, with a mass exponent of 1/1.9.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>atomIdentity</strong> – <code class="docutils literal notranslate"><span class="pre">&quot;O&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;S&quot;</span></code>.</p></li>
+<li><p><strong>deltaTuple</strong> – Two-element tuple. First value is 17O or 33S delta;
+second value is 18O or 34S delta.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Concentration vector for the isotope system.
+For sulfur, ordering is <code class="docutils literal notranslate"><span class="pre">(32S,</span> <span class="pre">33S,</span> <span class="pre">34S,</span> <span class="pre">36S)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[float, float, float, float]</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">twoDeltasToConcentration</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">))</span>
+<span class="go">(0.9976642714007893, 0.00037522253013810825, 0.001960506069072605, 0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="isotomics.basicDeltaOperations.concentrationToM1Ratio">
+<span class="sig-prename descclassname"><span class="pre">isotomics.basicDeltaOperations.</span></span><span class="sig-name descname"><span class="pre">concentrationToM1Ratio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concentrationTuple</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.basicDeltaOperations.concentrationToM1Ratio" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the M+1-to-unsubstituted ratio from a concentration vector. Very simple; if t is the tuple, it is t[1]/t[0].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>concentrationTuple</strong> – Four-element concentration vector in the internal
+isotope ordering.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Ratio of the mass-1 isotope to the unsubstituted isotope.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">concentrationToM1Ratio</span><span class="p">((</span><span class="mf">0.989052963984032</span><span class="p">,</span> <span class="mf">0.010947036015968062</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">0.0110682</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="isotomics.basicDeltaOperations.ratioToDelta">
 <span class="sig-prename descclassname"><span class="pre">isotomics.basicDeltaOperations.</span></span><span class="sig-name descname"><span class="pre">ratioToDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomIdentity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratio</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.basicDeltaOperations.ratioToDelta" title="Link to this definition">¶</a></dt>
-<dd><p>Convert an isotope ratio into a delta value.</p>
+<dd><p>Converts an isotope ratio into a delta value. The atomIdentity input can be the element symbol (for example, <code class="docutils literal notranslate"><span class="pre">&quot;C&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;H&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;N&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;O&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;S&quot;</span></code>), which is interpreted as the corresponding M+1 isotope (<code class="docutils literal notranslate"><span class="pre">&quot;13C&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;D&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;15N&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;17O&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;33S&quot;</span></code>). Or, it can be explciitly given as the M+1 isotope or (for oxygen and sulfur) other M+N isotopes (<code class="docutils literal notranslate"><span class="pre">&quot;18O&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;34S&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;36S&quot;</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -142,30 +143,29 @@ For systems with fewer than four components, unused entries are <code class="doc
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="isotomics.basicDeltaOperations.twoDeltasToConcentration">
-<span class="sig-prename descclassname"><span class="pre">isotomics.basicDeltaOperations.</span></span><span class="sig-name descname"><span class="pre">twoDeltasToConcentration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomIdentity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltaTuple</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.basicDeltaOperations.twoDeltasToConcentration" title="Link to this definition">¶</a></dt>
-<dd><p>Convert paired delta constraints into isotope concentrations.</p>
-<p>This variant handles systems where two deltas are explicitly constrained
-(17/18O or 33/34S), instead of deriving the second via mass scaling.</p>
+<dt class="sig sig-object py" id="isotomics.basicDeltaOperations.compareRelDelta">
+<span class="sig-prename descclassname"><span class="pre">isotomics.basicDeltaOperations.</span></span><span class="sig-name descname"><span class="pre">compareRelDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltaStd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltaSmp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.basicDeltaOperations.compareRelDelta" title="Link to this definition">¶</a></dt>
+<dd><p>Suppose you have two delta values in the same refernece frame: delta^1_{VPDB} and delta^2_{VPDB}. You want to know the delta value of sample 2 relative to sample 1, that is:</p>
+<p>1000 * (R^13C_2 / R^13C_1 - 1)</p>
+<p>This function computes that value, accounting for the non-additivity of delta values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>atomIdentity</strong> – <code class="docutils literal notranslate"><span class="pre">&quot;O&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;S&quot;</span></code>.</p></li>
-<li><p><strong>deltaTuple</strong> – Two-element tuple. First value is 17O or 33S delta;
-second value is 18O or 34S delta.</p></li>
+<li><p><strong>atomID</strong> – Isotope key passed to <a class="reference internal" href="#isotomics.basicDeltaOperations.deltaToConcentration" title="isotomics.basicDeltaOperations.deltaToConcentration"><code class="xref py py-func docutils literal notranslate"><span class="pre">deltaToConcentration()</span></code></a>.</p></li>
+<li><p><strong>deltaStd</strong> – Delta value of the standard (denominator).</p></li>
+<li><p><strong>deltaSmp</strong> – Delta value of the sample (numerator).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Concentration vector for the isotope system.
-For sulfur, ordering is <code class="docutils literal notranslate"><span class="pre">(32S,</span> <span class="pre">33S,</span> <span class="pre">34S,</span> <span class="pre">36S)</span></code>.</p>
+<dd class="field-even"><p>Sample-relative-to-standard delta value.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple[float, float, float, float]</p>
+<dd class="field-odd"><p>float</p>
 </dd>
 </dl>
 <p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">twoDeltasToConcentration</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">))</span>
-<span class="go">(0.9976642714007893, 0.00037522253013810825, 0.001960506069072605, 0)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">compareRelDelta</span><span class="p">(</span><span class="s2">&quot;13C&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">)</span>
+<span class="go">-10.101010101010166</span>
 </pre></div>
 </div>
 </dd></dl>

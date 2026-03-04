@@ -36,67 +36,88 @@
   <section id="module-isotomics.calcIsotopologues">
 <span id="isotomics-calcisotopologues"></span><h1>isotomics.calcIsotopologues<a class="headerlink" href="#module-isotomics.calcIsotopologues" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.calcAllIsotopologues">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">calcAllIsotopologues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setsOfSiteIsotopes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multinomialCoefficients</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M1Only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.calcAllIsotopologues" title="Link to this definition">¶</a></dt>
-<dd><p>Enumerate isotopologues and their symmetry numbers.</p>
-<p>This function returns all isotopologues implied by the site-level isotope
-options and the corresponding multiplicity (symmetry number) for each entry.
-For large systems, set <code class="docutils literal notranslate"><span class="pre">M1Only=True</span></code> to compute only the unsubstituted and
-M+1 isotopologues.</p>
+<dt class="sig sig-object py" id="isotomics.calcIsotopologues.inputToAtomDict">
+<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">inputToAtomDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M1Only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.inputToAtomDict" title="Link to this definition">¶</a></dt>
+<dd><p>The highest level function for calculating the isotopologues of a system.</p>
+<p>This takes in a molecular dataframe, giving information about a compound. It then calculates the isotopologues and their concentrations, number, and substitutions, and compiles these into a dictionary.</p>
+<p>It is referred to as an “Atom” dict because the representation of each isotopologue gives its substitution pattern by atom. For example, an isotopologue is given as a string such as ‘0001’, where each position corresponds to an atom and the value at that position corresponds to the isotope present. ‘0001’, for example, has the first three atoms unsubstituted and the fourth substituted.</p>
+<p>This will probably fail on personal computers past 10 million isotopologues or so. M1Only causes it to only compute the M+1 isotopologues, which is much faster and gives you everything you need for a M+1 experiment.</p>
+<p>For isotopologues with symmetry numbers above 1, the concentrations in this dictionary give the sum across all instances of that isotopologue. Therefore, the sum of all concentrations in this dictionary is 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>setsOfSiteIsotopes</strong> (<em>list</em><em>[</em><em>tuple</em><em>]</em>) – Site-level isotope options from
-<a class="reference internal" href="#isotomics.calcIsotopologues.calculateSetsOfSiteIsotopes" title="isotomics.calcIsotopologues.calculateSetsOfSiteIsotopes"><code class="xref py py-func docutils literal notranslate"><span class="pre">calculateSetsOfSiteIsotopes()</span></code></a>.</p></li>
-<li><p><strong>multinomialCoefficients</strong> (<em>list</em><em>[</em><em>tuple</em><em>]</em>) – Site-level multiplicities aligned
-with <code class="docutils literal notranslate"><span class="pre">setsOfSiteIsotopes</span></code>.</p></li>
-<li><p><strong>M1Only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, return only unsubstituted and M+1
+<li><p><strong>molecularDataFrame</strong> (<em>pandas.DataFrame</em>) – Molecule definition table.</p></li>
+<li><p><strong>disable</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, hide tqdm progress bars.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>M1Only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, compute only unsubstituted and M+1
 isotopologues. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p>setOfAllIsotopologues: Isotopologue tuple per molecular state.</p></li>
-<li><p>symmetryNumbers: Multiplicity for each isotopologue, same order as
-<code class="docutils literal notranslate"><span class="pre">setOfAllIsotopologues</span></code>.</p></li>
-</ul>
-</p>
+<dd class="field-even"><p>By-atom isotopologue dictionary.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple[list[tuple], list[int]]</p>
+<dd class="field-odd"><p>dict[str, dict]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sets_of_site_isotopes</span><span class="p">,</span> <span class="n">multinomial_coefficients</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calculateSetsOfSiteIsotopes</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">isotopologues</span><span class="p">,</span> <span class="n">symmetry_numbers</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calcAllIsotopologues</span><span class="p">(</span><span class="n">sets_of_site_isotopes</span><span class="p">,</span> <span class="n">multinomial_coefficients</span><span class="p">,</span> <span class="n">M1Only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">isotopologues</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">symmetry_numbers</span><span class="p">)</span>
-<span class="go">(3, 3)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">,</span><span class="s1">&#39;S&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atomDict</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">inputToAtomDict</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">,</span> <span class="n">disable</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">M1Only</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atomDict</span>
+<span class="go">{&#39;0000&#39;: {&#39;Number&#39;: 1,</span>
+<span class="go">    &#39;Full&#39;: &#39;(0, 0)00&#39;,</span>
+<span class="go">    &#39;Conc&#39;: 0.9275321060832549,</span>
+<span class="go">    &#39;Mass&#39;: 0,</span>
+<span class="go">    &#39;Subs&#39;: &#39;&#39;},</span>
+<span class="go">    &#39;0001&#39;: {&#39;Number&#39;: 1,</span>
+<span class="go">    &#39;Full&#39;: &#39;(0, 0)01&#39;,</span>
+<span class="go">    &#39;Conc&#39;: 0.0073061703996178,</span>
+<span class="go">    &#39;Mass&#39;: 1,</span>
+<span class="go">    &#39;Subs&#39;: &#39;33S&#39;},</span>
+<span class="go">    &#39;0002&#39;: {&#39;Number&#39;: 1,</span>
+<span class="go">    &#39;Full&#39;: &#39;(0, 0)02&#39;,</span>
+<span class="go">    &#39;Conc&#39;: 0.04096222938811236,</span>
+<span class="go">    &#39;Mass&#39;: 2,</span>
+<span class="go">    &#39;Subs&#39;: &#39;34S&#39;},</span>
+<span class="go">    &#39;0004&#39;: {&#39;Number&#39;: 1,</span>
+<span class="go">    &#39;Full&#39;: &#39;(0, 0)04&#39;,</span>
+<span class="go">    &#39;Conc&#39;: 9.764501493580858e-05,</span>
+<span class="go">    &#39;Mass&#39;: 4,</span>
+<span class="go">    &#39;Subs&#39;: &#39;36S&#39;},</span>
+<span class="go">    &#39;0010&#39;: {&#39;Number&#39;: 1,</span>
+<span class="go">    &#39;Full&#39;: &#39;(0, 0)10&#39;,</span>
+<span class="go">    &#39;Conc&#39;: 0.0003523694471010285,</span>
+<span class="go">    &#39;Mass&#39;: 1,</span>
+<span class="go">    &#39;Subs&#39;: &#39;17O&#39;},</span>
+<span class="go">    ...</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">totalC</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">isotopologues</span><span class="p">,</span> <span class="n">isoData</span> <span class="ow">in</span> <span class="n">atomDict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="n">totalC</span> <span class="o">+=</span> <span class="n">isoData</span><span class="p">[</span><span class="s1">&#39;Conc&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">totalC</span>
+<span class="go">1.0000000000000002</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.calcAtomDictionary">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">calcAtomDictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isotopologueConcentrationDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.calcAtomDictionary" title="Link to this definition">¶</a></dt>
-<dd><p>Build an isotopologue dictionary keyed by ATOM strings.</p>
-<p>Converts isotopologue keys from expanded notation to ATOM notation and adds
-derived metadata including total mass shift and substitution labels.</p>
+<dt class="sig sig-object py" id="isotomics.calcIsotopologues.massSelections">
+<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">massSelections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomDictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">massThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.massSelections" title="Link to this definition">¶</a></dt>
+<dd><p>Partition a by-atom dictionary into M0..Mn mass selections.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>isotopologueConcentrationDict</strong> (<em>dict</em>) – Output of
-<a class="reference internal" href="#isotomics.calcIsotopologues.calculateIsotopologueConcentrations" title="isotomics.calcIsotopologues.calculateIsotopologueConcentrations"><code class="xref py py-func docutils literal notranslate"><span class="pre">calculateIsotopologueConcentrations()</span></code></a>.</p></li>
-<li><p><strong>molecularDataFrame</strong> (<em>pandas.DataFrame</em>) – Molecule definition table.</p></li>
-<li><p><strong>disable</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, hide tqdm progress bars.
-Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>atomDictionary</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>dict</em><em>]</em>) – Output of <code class="xref py py-func docutils literal notranslate"><span class="pre">calcAtomDictionary()</span></code>.</p></li>
+<li><p><strong>massThreshold</strong> (<em>int</em><em>, </em><em>optional</em>) – Highest mass class to include. Defaults to
+<code class="docutils literal notranslate"><span class="pre">4</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dictionary keyed by ATOM string. Each value includes
-<code class="docutils literal notranslate"><span class="pre">'Number'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Full'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Conc'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Mass'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'Subs'</span></code>.</p>
+<dd class="field-even"><p>Dictionary with keys <code class="docutils literal notranslate"><span class="pre">'M0'</span></code> … <code class="docutils literal notranslate"><span class="pre">'M{massThreshold}'</span></code>;
+each value contains isotopologues from that mass class.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict[str, dict]</p>
@@ -107,124 +128,8 @@ Defaults to <code class="docutils literal notranslate"><span class="pre">False</
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Site Names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">],</span> <span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]})</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Site Names&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">by_atom</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">inputToAtomDict</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">by_atom</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="go">[&#39;0&#39;, &#39;1&#39;]</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.calcSubDictionary">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">calcSubDictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isotopologueConcentrationDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomInput</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.calcSubDictionary" title="Link to this definition">¶</a></dt>
-<dd><p>Build an isotopologue dictionary keyed by substitution pattern.</p>
-<p>This reorganizes isotopologue information so entries are keyed by substitution
-labels (for example <code class="docutils literal notranslate"><span class="pre">'D'</span></code> or <code class="docutils literal notranslate"><span class="pre">'13C-15N'</span></code>) rather than ATOM strings.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>isotopologueConcentrationDict</strong> (<em>dict</em>) – Either the output of
-<a class="reference internal" href="#isotomics.calcIsotopologues.calculateIsotopologueConcentrations" title="isotomics.calcIsotopologues.calculateIsotopologueConcentrations"><code class="xref py py-func docutils literal notranslate"><span class="pre">calculateIsotopologueConcentrations()</span></code></a> (default mode) or a
-precomputed by-atom dictionary (<code class="docutils literal notranslate"><span class="pre">atomInput=True</span></code>).</p></li>
-<li><p><strong>molecularDataFrame</strong> (<em>pandas.DataFrame</em>) – Molecule definition table.</p></li>
-<li><p><strong>atomInput</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, interpret
-<code class="docutils literal notranslate"><span class="pre">isotopologueConcentrationDict</span></code> as by-atom input. Defaults to
-<code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dictionary keyed by substitution string. Each value
-includes aggregated <code class="docutils literal notranslate"><span class="pre">'Number'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Full'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Conc'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Mass'</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">'ATOM'</span></code> fields.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict[str, dict]</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Site Names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">],</span> <span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]})</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Site Names&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">by_atom</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">inputToAtomDict</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">by_sub</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calcSubDictionary</span><span class="p">(</span><span class="n">by_atom</span><span class="p">,</span> <span class="n">molecular_df</span><span class="p">,</span> <span class="n">atomInput</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;13C&#39;</span> <span class="ow">in</span> <span class="n">by_sub</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.calcThroughM1Isotopologues">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">calcThroughM1Isotopologues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setsOfSiteIsotopes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.calcThroughM1Isotopologues" title="Link to this definition">¶</a></dt>
-<dd><p>Build only the unsubstituted and M+1 isotopologue set.</p>
-<p>This is a reduced alternative to <a class="reference internal" href="#isotomics.calcIsotopologues.calcAllIsotopologues" title="isotomics.calcIsotopologues.calcAllIsotopologues"><code class="xref py py-func docutils literal notranslate"><span class="pre">calcAllIsotopologues()</span></code></a> for workflows
-that only require M+1 populations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>setsOfSiteIsotopes</strong> (<em>list</em><em>[</em><em>tuple</em><em>]</em>) – Site-level isotope options.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p>setOfM1Isotopologues: Unsubstituted isotopologue plus M+1 entries.</p></li>
-<li><p>symmetryNumbers: Multiplicity for each isotopologue.</p></li>
-</ul>
-</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple[list[tuple], list[int]]</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sets_of_site_isotopes</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">isotopologues</span><span class="p">,</span> <span class="n">symmetry_numbers</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calcThroughM1Isotopologues</span><span class="p">(</span><span class="n">sets_of_site_isotopes</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">isotopologues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">[0, 0]</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.calculateIsotopologueConcentrations">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">calculateIsotopologueConcentrations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setOfAllIsotopologues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetryNumbers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concentrationArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.calculateIsotopologueConcentrations" title="Link to this definition">¶</a></dt>
-<dd><p>Compute stochastic concentrations for each isotopologue.</p>
-<p>Concentrations are calculated by multiplying relevant site-level isotope
-concentrations and applying the isotopologue symmetry number.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>setOfAllIsotopologues</strong> (<em>list</em><em>[</em><em>tuple</em><em>]</em>) – Isotopologue tuples.</p></li>
-<li><p><strong>symmetryNumbers</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Multiplicity for each isotopologue.</p></li>
-<li><p><strong>concentrationArray</strong> (<em>tuple</em><em>[</em><em>numpy.ndarray</em><em>, </em><em>...</em><em>]</em>) – Output of
-<a class="reference internal" href="#isotomics.calcIsotopologues.siteSpecificConcentrations" title="isotomics.calcIsotopologues.siteSpecificConcentrations"><code class="xref py py-func docutils literal notranslate"><span class="pre">siteSpecificConcentrations()</span></code></a>.</p></li>
-<li><p><strong>disable</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, hide tqdm progress bars.
-Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>Mapping from isotopologue string representation to a
-record with:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">'Conc'</span></code>: concentration of that isotopologue class.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'num'</span></code>: symmetry number / multiplicity.</p></li>
-</ul>
-</div></blockquote>
-</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict[str, dict]</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sets_of_site_isotopes</span><span class="p">,</span> <span class="n">multinomial_coefficients</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calculateSetsOfSiteIsotopes</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">isotopologues</span><span class="p">,</span> <span class="n">symmetry_numbers</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calcAllIsotopologues</span><span class="p">(</span><span class="n">sets_of_site_isotopes</span><span class="p">,</span> <span class="n">multinomial_coefficients</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">concentration_array</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">siteSpecificConcentrations</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calculateIsotopologueConcentrations</span><span class="p">(</span><span class="n">isotopologues</span><span class="p">,</span> <span class="n">symmetry_numbers</span><span class="p">,</span> <span class="n">concentration_array</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="go">[&#39;0&#39;, &#39;1&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">ci</span><span class="o">.</span><span class="n">massSelections</span><span class="p">(</span><span class="n">by_atom</span><span class="p">,</span> <span class="n">massThreshold</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="go">[&#39;M0&#39;, &#39;M1&#39;]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -283,167 +188,6 @@ contains multinomial multiplicities matching
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.checkClumpDelta">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">checkClumpDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">siteList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clumpD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stochD</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.checkClumpDelta" title="Link to this definition">¶</a></dt>
-<dd><p>Print CAP Delta for a specified clump relative to stochastic abundance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>siteList</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Site names defining the clump.</p></li>
-<li><p><strong>molecularDataFrame</strong> (<em>pandas.DataFrame</em>) – Molecule definition table.</p></li>
-<li><p><strong>clumpD</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>dict</em><em>]</em>) – By-atom dictionary with clump applied.</p></li>
-<li><p><strong>stochD</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>dict</em><em>]</em>) – Baseline stochastic by-atom dictionary.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Prints the CAP Delta value for the requested clump.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Site Names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">],</span> <span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]})</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Site Names&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stoch</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">inputToAtomDict</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">clumped</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">introduceClump</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">stoch</span><span class="p">),</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">],</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">molecular_df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ci</span><span class="o">.</span><span class="n">checkClumpDelta</span><span class="p">([</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">],</span> <span class="n">molecular_df</span><span class="p">,</span> <span class="n">clumped</span><span class="p">,</span> <span class="n">stoch</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.condenseStr">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">condenseStr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.condenseStr" title="Link to this definition">¶</a></dt>
-<dd><p>Convert expanded isotopologue strings to ATOM strings.</p>
-<p>Expanded strings for multi-atom sites (for example <code class="docutils literal notranslate"><span class="pre">&quot;(0,1)0&quot;</span></code>) are
-flattened to ATOM-style strings (for example <code class="docutils literal notranslate"><span class="pre">&quot;010&quot;</span></code>).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – Expanded isotopologue string.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Condensed ATOM string.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ci</span><span class="o">.</span><span class="n">condenseStr</span><span class="p">(</span><span class="s1">&#39;(0,1)0&#39;</span><span class="p">)</span>
-<span class="go">&#39;010&#39;</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.inputToAtomDict">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">inputToAtomDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M1Only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.inputToAtomDict" title="Link to this definition">¶</a></dt>
-<dd><p>Run the full pipeline from molecular input to by-atom dictionary.</p>
-<p>This is a convenience wrapper around:
-<code class="docutils literal notranslate"><span class="pre">calculateSetsOfSiteIsotopes</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">calcAllIsotopologues</span></code> -&gt;
-<code class="docutils literal notranslate"><span class="pre">siteSpecificConcentrations</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">calculateIsotopologueConcentrations</span></code> -&gt;
-<code class="docutils literal notranslate"><span class="pre">calcAtomDictionary</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>molecularDataFrame</strong> (<em>pandas.DataFrame</em>) – Molecule definition table.</p></li>
-<li><p><strong>disable</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, hide tqdm progress bars.
-Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><strong>M1Only</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, compute only unsubstituted and M+1
-isotopologues. Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>By-atom isotopologue dictionary.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict[str, dict]</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Site Names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;N1&#39;</span><span class="p">],</span> <span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]})</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Site Names&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">by_atom</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">inputToAtomDict</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">M1Only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">by_atom</span><span class="p">)</span>
-<span class="go">3</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.introduceClump">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">introduceClump</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clumpD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">siteList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clumpAmount</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.introduceClump" title="Link to this definition">¶</a></dt>
-<dd><p>Introduce a mass-1 clump while preserving site-specific abundances.</p>
-<p>The function increases the concentration of the selected clumped isotopologue,
-decreases the relevant singly substituted isotopologues, and adjusts the
-unsubstituted isotopologue to conserve totals.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>clumpD</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>dict</em><em>]</em>) – By-atom isotopologue dictionary.</p></li>
-<li><p><strong>siteList</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Site names to clump (for example
-<code class="docutils literal notranslate"><span class="pre">['Cmethyl',</span> <span class="pre">'Cgamma']</span></code>).</p></li>
-<li><p><strong>clumpAmount</strong> (<em>float</em>) – Clump amount in concentration space (not CAP Delta).</p></li>
-<li><p><strong>molecularDataFrame</strong> (<em>pandas.DataFrame</em>) – Molecule definition table.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Updated by-atom dictionary including the clump.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict[str, dict]</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Site Names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">],</span> <span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]})</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Site Names&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">stoch</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">inputToAtomDict</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">clumped</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">introduceClump</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">stoch</span><span class="p">),</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">],</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="n">molecular_df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">clumped</span><span class="p">[</span><span class="s1">&#39;11&#39;</span><span class="p">][</span><span class="s1">&#39;Conc&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">stoch</span><span class="p">[</span><span class="s1">&#39;11&#39;</span><span class="p">][</span><span class="s1">&#39;Conc&#39;</span><span class="p">]</span>
-<span class="go">True</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.massSelections">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">massSelections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atomDictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">massThreshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.massSelections" title="Link to this definition">¶</a></dt>
-<dd><p>Partition a by-atom dictionary into M0..Mn mass selections.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>atomDictionary</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>dict</em><em>]</em>) – Output of <a class="reference internal" href="#isotomics.calcIsotopologues.calcAtomDictionary" title="isotomics.calcIsotopologues.calcAtomDictionary"><code class="xref py py-func docutils literal notranslate"><span class="pre">calcAtomDictionary()</span></code></a>.</p></li>
-<li><p><strong>massThreshold</strong> (<em>int</em><em>, </em><em>optional</em>) – Highest mass class to include. Defaults to
-<code class="docutils literal notranslate"><span class="pre">4</span></code>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dictionary with keys <code class="docutils literal notranslate"><span class="pre">'M0'</span></code> … <code class="docutils literal notranslate"><span class="pre">'M{massThreshold}'</span></code>;
-each value contains isotopologues from that mass class.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict[str, dict]</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Site Names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">],</span> <span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]})</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Site Names&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">by_atom</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">inputToAtomDict</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">ci</span><span class="o">.</span><span class="n">massSelections</span><span class="p">(</span><span class="n">by_atom</span><span class="p">,</span> <span class="n">massThreshold</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="go">[&#39;M0&#39;, &#39;M1&#39;]</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="isotomics.calcIsotopologues.siteSpecificConcentrations">
 <span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">siteSpecificConcentrations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.siteSpecificConcentrations" title="Link to this definition">¶</a></dt>
 <dd><p>Convert per-site deltas into isotope concentration arrays.</p>
@@ -473,59 +217,40 @@ contains concentrations for substitutions of mass <code class="docutils literal 
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.strSiteElements">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">strSiteElements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.strSiteElements" title="Link to this definition">¶</a></dt>
-<dd><p>Expand site elements into an atom-position string.</p>
-<p>For a molecular table with multi-atom sites, this returns a string where each
-atom position is represented explicitly (for example <code class="docutils literal notranslate"><span class="pre">&quot;NNO&quot;</span></code>).</p>
+<dt class="sig sig-object py" id="isotomics.calcIsotopologues.calcSubDictionary">
+<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">calcSubDictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isotopologueConcentrationDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">molecularDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomInput</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.calcSubDictionary" title="Link to this definition">¶</a></dt>
+<dd><p>Build an isotopologue dictionary keyed by substitution pattern.</p>
+<p>This reorganizes isotopologue information so entries are keyed by substitution
+labels (for example <code class="docutils literal notranslate"><span class="pre">'D'</span></code> or <code class="docutils literal notranslate"><span class="pre">'13C-15N'</span></code>) rather than ATOM strings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>molecularDataFrame</strong> (<em>pandas.DataFrame</em>) – Molecule definition table with
-<code class="docutils literal notranslate"><span class="pre">'IDS'</span></code> and <code class="docutils literal notranslate"><span class="pre">'Number'</span></code> columns.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>isotopologueConcentrationDict</strong> (<em>dict</em>) – Either the output of
+<code class="xref py py-func docutils literal notranslate"><span class="pre">calculateIsotopologueConcentrations()</span></code> (default mode) or a
+precomputed by-atom dictionary (<code class="docutils literal notranslate"><span class="pre">atomInput=True</span></code>).</p></li>
+<li><p><strong>molecularDataFrame</strong> (<em>pandas.DataFrame</em>) – Molecule definition table.</p></li>
+<li><p><strong>atomInput</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, interpret
+<code class="docutils literal notranslate"><span class="pre">isotopologueConcentrationDict</span></code> as by-atom input. Defaults to
+<code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Expanded element string by atomic position.</p>
+<dd class="field-even"><p>Dictionary keyed by substitution string. Each value
+includes aggregated <code class="docutils literal notranslate"><span class="pre">'Number'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Full'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Conc'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Mass'</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">'ATOM'</span></code> fields.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>dict[str, dict]</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;O&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ci</span><span class="o">.</span><span class="n">strSiteElements</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">)</span>
-<span class="go">&#39;NNO&#39;</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="isotomics.calcIsotopologues.uEl">
-<span class="sig-prename descclassname"><span class="pre">isotomics.calcIsotopologues.</span></span><span class="sig-name descname"><span class="pre">uEl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">el</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#isotomics.calcIsotopologues.uEl" title="Link to this definition">¶</a></dt>
-<dd><p>Map an element and cardinal mass shift to substitution label.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>el</strong> (<em>str</em>) – Element symbol (<code class="docutils literal notranslate"><span class="pre">'C'</span></code>, <code class="docutils literal notranslate"><span class="pre">'H'</span></code>, <code class="docutils literal notranslate"><span class="pre">'N'</span></code>, <code class="docutils literal notranslate"><span class="pre">'O'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'S'</span></code>).</p></li>
-<li><p><strong>n</strong> (<em>int</em><em> | </em><em>str</em>) – Cardinal mass shift. <code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">'x'</span></code> returns an empty
-string.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Substitution label (for example <code class="docutils literal notranslate"><span class="pre">'13C'</span></code> or <code class="docutils literal notranslate"><span class="pre">'18O'</span></code>), or an empty
-string for unsubstituted positions.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">isotomics</span><span class="w"> </span><span class="kn">import</span> <span class="n">calcIsotopologues</span> <span class="k">as</span> <span class="n">ci</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ci</span><span class="o">.</span><span class="n">uEl</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="go">&#39;13C&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ci</span><span class="o">.</span><span class="n">uEl</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="go">&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecular_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Site Names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C1&#39;</span><span class="p">],</span> <span class="s1">&#39;IDS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span> <span class="s1">&#39;Number&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;deltas&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]})</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Site Names&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">by_atom</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">inputToAtomDict</span><span class="p">(</span><span class="n">molecular_df</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">by_sub</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">calcSubDictionary</span><span class="p">(</span><span class="n">by_atom</span><span class="p">,</span> <span class="n">molecular_df</span><span class="p">,</span> <span class="n">atomInput</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s1">&#39;13C&#39;</span> <span class="ow">in</span> <span class="n">by_sub</span>
+<span class="go">True</span>
 </pre></div>
 </div>
 </dd></dl>

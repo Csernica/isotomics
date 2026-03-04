@@ -1,7 +1,0 @@
-# isotomics.quickstart
-
-```{automodule} isotomics.quickstart
-:members:
-:undoc-members:
-:show-inheritance:
-```

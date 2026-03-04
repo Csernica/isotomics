@@ -546,12 +546,17 @@ def calcSubDictionary(isotopologueConcentrationDict, molecularDataFrame, atomInp
 
 def inputToAtomDict(molecularDataFrame, disable = False, M1Only = False):
     """
-    Run the full pipeline from molecular input to by-atom dictionary.
+    The highest level function for calculating the isotopologues of a system. 
+    
+    This takes in a molecular dataframe, giving information about a compound. It then calculates the isotopologues and their concentrations, number, and substitutions, and compiles these into a dictionary. 
 
-    This is a convenience wrapper around:
-    ``calculateSetsOfSiteIsotopes`` -> ``calcAllIsotopologues`` ->
-    ``siteSpecificConcentrations`` -> ``calculateIsotopologueConcentrations`` ->
-    ``calcAtomDictionary``.
+    It is referred to as an "Atom" dict because the representation of each isotopologue gives its substitution pattern by atom. For example, an isotopologue is given as a string such as '0001', where each position corresponds to an atom and the value at that position corresponds to the isotope present. '0001', for example, has the first three atoms unsubstituted and the fourth substituted. 
+
+    This will probably fail on personal computers past 10 million isotopologues or so. M1Only causes it to only compute the M+1 isotopologues, which is much faster and gives you everything you need for a M+1 experiment. 
+
+    For isotopologues with symmetry numbers above 1, the concentrations in this dictionary give the sum across all instances of that isotopologue. Therefore, the sum of all concentrations in this dictionary is 1.
+
+    This function also records the total mass shift of each isotopologue, the substitutions present, and a string called 'Full' which gives the isotopologue in expanded format (e.g., '(0, 0)00' rather than '0000'). This broader description may be useful to see information about sites. It is also worthwhile to note that certain combinations that may seem reasonable will not appear based on the structure of 'Full'. For example '(1, 0)00' will not appear because the first site is a two-atom site and these fill in from the right; the only combinations are '(0,0)', '(0,1)', and '(1,1)'. Therefore, the isotopologue '1000' does not exist but '0100' does.  
 
     Args:
         molecularDataFrame (pandas.DataFrame): Molecule definition table.
@@ -566,10 +571,41 @@ def inputToAtomDict(molecularDataFrame, disable = False, M1Only = False):
     Examples:
         >>> import pandas as pd
         >>> from isotomics import calcIsotopologues as ci
-        >>> molecular_df = pd.DataFrame({'Site Names': ['C1', 'N1'], 'IDS': ['C', 'N'], 'Number': [1, 1], 'deltas': [0, 0]}).set_index('Site Names')
-        >>> by_atom = ci.inputToAtomDict(molecular_df, disable=True, M1Only=True)
-        >>> len(by_atom)
-        3
+        >>> molecular_df = pd.DataFrame({'IDS': ['C', 'O','S'], 'Number': [2, 1,1], 'deltas': [-10, 0,0]})
+        >>> atomDict = ci.inputToAtomDict(molecular_df, disable = False, M1Only = False)
+        >>> atomDict
+        {'0000': {'Number': 1,
+            'Full': '(0, 0)00',
+            'Conc': 0.9275321060832549,
+            'Mass': 0,
+            'Subs': ''},
+            '0001': {'Number': 1,
+            'Full': '(0, 0)01',
+            'Conc': 0.0073061703996178,
+            'Mass': 1,
+            'Subs': '33S'},
+            '0002': {'Number': 1,
+            'Full': '(0, 0)02',
+            'Conc': 0.04096222938811236,
+            'Mass': 2,
+            'Subs': '34S'},
+            '0004': {'Number': 1,
+            'Full': '(0, 0)04',
+            'Conc': 9.764501493580858e-05,
+            'Mass': 4,
+            'Subs': '36S'},
+            '0010': {'Number': 1,
+            'Full': '(0, 0)10',
+            'Conc': 0.0003523694471010285,
+            'Mass': 1,
+            'Subs': '17O'},
+            ...
+
+        >>> totalC = 0
+        >>> for isotopologues, isoData in atomDict.items():
+        ...     totalC += isoData['Conc']
+        >>> totalC
+        1.0000000000000002
     """
     if disable == False:
         print("Calculating Isotopologue Concentrations")
@@ -587,7 +623,7 @@ def inputToAtomDict(molecularDataFrame, disable = False, M1Only = False):
 
 def massSelections(atomDictionary, massThreshold = 4):
     """
-    Partition a by-atom dictionary into M0..Mn mass selections.
+    Takes a by-atom isotopologue dictionary and pulls out only those isotopologues with a cardinal mass increase <= massThreshold. 
 
     Args:
         atomDictionary (dict[str, dict]): Output of :func:`calcAtomDictionary`.
@@ -601,10 +637,37 @@ def massSelections(atomDictionary, massThreshold = 4):
     Examples:
         >>> import pandas as pd
         >>> from isotomics import calcIsotopologues as ci
-        >>> molecular_df = pd.DataFrame({'Site Names': ['C1'], 'IDS': ['C'], 'Number': [1], 'deltas': [0]}).set_index('Site Names')
-        >>> by_atom = ci.inputToAtomDict(molecular_df, disable=True)
-        >>> sorted(ci.massSelections(by_atom, massThreshold=1).keys())
-        ['M0', 'M1']
+        >>> molecular_df = pd.DataFrame({'IDS': ['C', 'O','S'], 'Number': [2, 1,1], 'deltas': [-10, 0,0]})
+        >>> atomDict = ci.inputToAtomDict(molecular_df, disable = False, M1Only = False)
+        >>> selectedIsotopologues = ci.massSelections(atomDict, massThreshold=2)
+        >>> selectedIsotopologues
+
+        'M0': {'0000': {'Number': 1,
+        'Full': '(0, 0)00',
+        'Conc': 0.9275321060832549,
+        'Mass': 0,
+        'Subs': ''}},
+        'M1': {'0001': {'Number': 1,
+        'Full': '(0, 0)01',
+        'Conc': 0.0073061703996178,
+        'Mass': 1,
+        'Subs': '33S'},
+        '0010': {'Number': 1,
+        'Full': '(0, 0)10',
+        'Conc': 0.0003523694471010285,
+        'Mass': 1,
+        'Subs': '17O'},
+        '0100': {'Number': 2,
+        'Full': '(0, 1)00',
+        'Conc': 0.020532221713101362,
+        'Mass': 1,
+        'Subs': '13C'}},
+        'M2': {'0002': {'Number': 1,
+        'Full': '(0, 0)02',
+        'Conc': 0.04096222938811236,
+        'Mass': 2,
+        'Subs': '34S'},
+        ...
     """
     MNDict = {}
     

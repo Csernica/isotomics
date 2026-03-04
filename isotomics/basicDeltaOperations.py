@@ -13,11 +13,15 @@ STD_Rs = {"H": 0.00015576, "C": 0.011180, "N": 0.003676, "17O": 0.0003799, "18O"
     
 def deltaToConcentration(atomIdentity,delta):
     """
-    Convert a delta value into internal isotope concentrations.
+    Converts a delta value for a particular atom into a tuple giving isotope concentration. The tuple is ordered: (M+0, M+1, M+2, M+4), and hardcoded to have 4 elements. For example for carbon, the tuple yields:
+    
+    ([12C], [13C], 0, 0). 
 
-    For isotope systems with multiple rare isotopes (for example O and S),
-    additional isotope concentrations are set using the mass-scaling rules
-    used by Isotomics.
+    Currently, this function accepts carbon, hydrogen, nitrogen, oxygen, and sulfur. The atomIdentity can be given as the element symbol (for example, ``"C"``, ``"H"``, ``"N"``, ``"O"``, ``"S"``) or as the M+1 isotope ``"13C"``, ``"D"``, ``"15N"``, ``"17O"``, ``"33S"``).
+
+    For isotope systems with multiple rare isotopes ('O', or 'S'), the delta value is assumed to be for the M+1 isotope (17O or 33S). The M+2 isotope is then derived via mass-scaling. For oxygen, the mass exponent is 0.52; for sulfur it is 0.515 (for 34S from 33S) and 1 / 1.9 (for 36S from 34S). 
+
+    For more precision with the oxygen and sulfur systems, you may provide paired delta values via :func:`twoDeltasToConcentration`. 
 
     Args:
         atomIdentity: Isotope key identifying the ratio system (for example,
@@ -43,7 +47,7 @@ def deltaToConcentration(atomIdentity,delta):
         
         return (1-concentrationSub,concentrationSub,0,0)
     
-    if atomIdentity == 'H' or atomIdentity == 'D':
+    if atomIdentity == 'H' or atomIdentity == 'D' or atomIdentity == '2H':
         ratio = (delta/1000+1)*STD_Rs['H']
         concentrationSub = ratio/(1+ratio)
         
@@ -101,10 +105,7 @@ def deltaToConcentration(atomIdentity,delta):
 
 def twoDeltasToConcentration(atomIdentity, deltaTuple):
     """
-    Convert paired delta constraints into isotope concentrations.
-
-    This variant handles systems where two deltas are explicitly constrained
-    (17/18O or 33/34S), instead of deriving the second via mass scaling.
+    A variant of :func:`deltaToConcentration` used for oxygen and sulfur. This function takes multiple delta values and returns a concentration tuple. Note that 36S is still derived from 34S via mass-scaling, with a mass exponent of 1/1.9. 
 
     Args:
         atomIdentity: ``"O"`` or ``"S"``.
@@ -152,7 +153,7 @@ def twoDeltasToConcentration(atomIdentity, deltaTuple):
     
 def concentrationToM1Ratio(concentrationTuple):
     """
-    Compute the M+1-to-unsubstituted ratio from a concentration vector.
+    Compute the M+1-to-unsubstituted ratio from a concentration vector. Very simple; if t is the tuple, it is t[1]/t[0]. 
 
     Args:
         concentrationTuple: Four-element concentration vector in the internal
@@ -169,7 +170,7 @@ def concentrationToM1Ratio(concentrationTuple):
 
 def ratioToDelta(atomIdentity, ratio):
     """
-    Convert an isotope ratio into a delta value.
+    Converts an isotope ratio into a delta value. The atomIdentity input can be the element symbol (for example, ``"C"``, ``"H"``, ``"N"``, ``"O"``, ``"S"``), which is interpreted as the corresponding M+1 isotope (``"13C"``, ``"D"``, ``"15N"``, ``"17O"``, ``"33S"``). Or, it can be explciitly given as the M+1 isotope or (for oxygen and sulfur) other M+N isotopes (``"18O"``, ``"34S"``, ``"36S"``).
 
     Args:
         atomIdentity: Isotope key of interest.
@@ -183,7 +184,7 @@ def ratioToDelta(atomIdentity, ratio):
         -10.000000000000009
     """
     delta = 0
-    if atomIdentity == 'D':
+    if atomIdentity == 'D' or atomIdentity == '2H':
         atomIdentity = 'H'
         
     if atomIdentity in 'HCN' or atomIdentity in ['13C','15N']:
@@ -212,9 +213,11 @@ def ratioToDelta(atomIdentity, ratio):
 
 def compareRelDelta(atomID, deltaStd, deltaSmp):
     """
-    Compute sample-relative-to-standard delta in CRF space.
+    Suppose you have two delta values in the same refernece frame: delta^1_{VPDB} and delta^2_{VPDB}. You want to know the delta value of sample 2 relative to sample 1, that is: 
 
-    This comparison accounts for non-additivity of delta values.
+    1000 * (R^13C_2 / R^13C_1 - 1)
+
+    This function computes that value, accounting for the non-additivity of delta values.
 
     Args:
         atomID: Isotope key passed to :func:`deltaToConcentration`.

@@ -2,6 +2,10 @@ isotomics.basicDeltaOperations
 ==============================
 
 .. automodule:: isotomics.basicDeltaOperations
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   :no-members:
+
+.. autofunction:: isotomics.basicDeltaOperations.deltaToConcentration
+.. autofunction:: isotomics.basicDeltaOperations.twoDeltasToConcentration
+.. autofunction:: isotomics.basicDeltaOperations.concentrationToM1Ratio
+.. autofunction:: isotomics.basicDeltaOperations.ratioToDelta
+.. autofunction:: isotomics.basicDeltaOperations.compareRelDelta

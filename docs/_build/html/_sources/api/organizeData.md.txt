@@ -1,7 +1,0 @@
-# isotomics.organizeData
-
-```{automodule} isotomics.organizeData
-:members:
-:undoc-members:
-:show-inheritance:
-```

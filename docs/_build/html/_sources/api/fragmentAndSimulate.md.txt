@@ -1,7 +1,0 @@
-# isotomics.fragmentAndSimulate
-
-```{automodule} isotomics.fragmentAndSimulate
-:members:
-:undoc-members:
-:show-inheritance:
-```
