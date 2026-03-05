@@ -242,7 +242,7 @@ def simulateMeasurement(initializedMolecule, abundanceThreshold = 0, UValueList 
         byAtom = addClumps(byAtom, molecularDataFrame, clumpD)
 
     #bySub is an representation of data, a dictionary where keys are substitutions (e.g., '13C'), and values are their abundances. 
-    bySub = ci.calcSubDictionary(byAtom, molecularDataFrame, atomInput = True)
+    bySub = ci.subDictionaryFromAtom(byAtom, molecularDataFrame)
     
     #Initialize Measurement output
     allMeasurementInfo = {}

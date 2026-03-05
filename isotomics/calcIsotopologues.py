@@ -418,11 +418,10 @@ def uEl(el, n):
 
 def strSiteElements(molecularDataFrame):
     """
-    Expand site elements into an atom-position string.
+    The molecular dataframe is defined with sites, which each have a number and an element ID.
 
-    For a molecular table with multi-atom sites, this returns a string where each
-    atom position is represented explicitly (for example ``"NNO"``).
-
+    This function uses those values to compute an isotoplogue string where each atom position is represented explicitly. For example, if we have a site with element ID 'N' and number 2, this function will return 'NN' for that site. It repeats this process on all sites to compile a full string of site elements. 
+ 
     Args:
         molecularDataFrame (pandas.DataFrame): Molecule definition table with
             ``'IDS'`` and ``'Number'`` columns.
@@ -486,21 +485,12 @@ def calcAtomDictionary(isotopologueConcentrationDict, molecularDataFrame, disabl
     
     return byAtom
 
-def calcSubDictionary(isotopologueConcentrationDict, molecularDataFrame, atomInput = False):
+def subDictionaryFromAtom(atomDict):
     """
-    Build an isotopologue dictionary keyed by substitution pattern.
-
-    This reorganizes isotopologue information so entries are keyed by substitution
-    labels (for example ``'D'`` or ``'13C-15N'``) rather than ATOM strings.
+    The 'atom' dictionary has keys corresponding to atom strings. Often, it is useful to retrieve information by substituion rather than atom string. For example, one may want to know the concentration of all isotopologues with a 13C substitution. This function reorganizes the atom dictionary by substitution. 
 
     Args:
-        isotopologueConcentrationDict (dict): Either the output of
-            :func:`calculateIsotopologueConcentrations` (default mode) or a
-            precomputed by-atom dictionary (``atomInput=True``).
-        molecularDataFrame (pandas.DataFrame): Molecule definition table.
-        atomInput (bool, optional): If ``True``, interpret
-            ``isotopologueConcentrationDict`` as by-atom input. Defaults to
-            ``False``.
+        atomDict (dict): Output of       :func:`inputToAtomDict`.
 
     Returns:
         dict[str, dict]: Dictionary keyed by substitution string. Each value
@@ -510,38 +500,49 @@ def calcSubDictionary(isotopologueConcentrationDict, molecularDataFrame, atomInp
     Examples:
         >>> import pandas as pd
         >>> from isotomics import calcIsotopologues as ci
-        >>> molecular_df = pd.DataFrame({'Site Names': ['C1'], 'IDS': ['C'], 'Number': [1], 'deltas': [0]}).set_index('Site Names')
-        >>> by_atom = ci.inputToAtomDict(molecular_df, disable=True)
-        >>> by_sub = ci.calcSubDictionary(by_atom, molecular_df, atomInput=True)
-        >>> '13C' in by_sub
-        True
+        >>> molecular_df = pd.DataFrame({'IDS': ['C', 'O','S'], 'Number': [2, 1,1], 'deltas': [-10, 0,0]})
+        >>> atomDict = ci.inputToAtomDict(molecular_df, disable = False, M1Only = False)
+        >>> subDict = ci.subDictionaryFromAtom(atomDict)
+        >>> subDict
+        {'': {'Number': 1,
+        'Full': ['(0, 0)00'],
+        'Conc': 0.9275321060832549,
+        'Mass': 0,
+        'ATOM': ['0000']},
+        '33S': {'Number': 1,
+        'Full': ['(0, 0)01'],
+        'Conc': 0.0073061703996178,
+        'Mass': 1,
+        'ATOM': ['0001']},
+        '34S': {'Number': 1,
+        'Full': ['(0, 0)02'],
+        'Conc': 0.04096222938811236,
+        'Mass': 2,
+        'ATOM': ['0002']},
+        '36S': {'Number': 1,
+        'Full': ['(0, 0)04'],
+        'Conc': 9.764501493580858e-05,
+        'Mass': 4,
+        'ATOM': ['0004']},
+        '17O': {'Number': 1,
+        'Full': ['(0, 0)10'],
+        'Conc': 0.0003523694471010285,
+        'Mass': 1,
+        'ATOM': ['0010']},
+        ...
     """
-    siteElements = strSiteElements(molecularDataFrame)
-    if atomInput == False:
-        bySub = {}
-        for i, v in isotopologueConcentrationDict.items():
-            ATOM = condenseStr(i)
-            Subs = ''.join([uEl(element, int(number)) for element, number in zip(siteElements, ATOM)])
-            if Subs not in bySub:
-                bySub[Subs] = {'Number': 0, 'Full': [],'Conc': 0, 'Mass': [], 'ATOM': []}
-            bySub[Subs]['Number'] += v['num']
-            bySub[Subs]['Full'].append(i)
-            bySub[Subs]['Conc'] += v['Conc']
-            bySub[Subs]['Mass'].append(np.array(list(map(int,ATOM))).sum())
-            bySub[Subs]['ATOM'].append(ATOM)
-    
-    else:
-        bySub = {}
-        for i, v in isotopologueConcentrationDict.items():
-            Subs = v['Subs']
-            if Subs not in bySub:
-                bySub[Subs] = {'Number': 0, 'Full': [],'Conc': 0, 'Mass': [], 'ATOM': []}
-            bySub[Subs]['Number'] += v['Number']
-            bySub[Subs]['Full'].append(v['Full'])
-            bySub[Subs]['Conc'] += v['Conc']
-            bySub[Subs]['Mass'].append(v['Mass'])
-            bySub[Subs]['ATOM'].append(i)
-                
+    bySub = {}
+    for i, v in atomDict.items():
+        Subs = v['Subs']
+        if Subs not in bySub:
+            bySub[Subs] = {'Number': 0, 'Full': [], 'Conc': 0, 'Mass': 0, 'ATOM': []}
+        bySub[Subs]['Number'] += v['Number']
+        bySub[Subs]['Full'].append(v['Full'])
+        bySub[Subs]['Conc'] += v['Conc']
+        #note mass is reassigned for each substitution. Should be fine as they are all identical. 
+        bySub[Subs]['Mass'] = v['Mass']
+        bySub[Subs]['ATOM'].append(i)
+
     return bySub
 
 def inputToAtomDict(molecularDataFrame, disable = False, M1Only = False):
@@ -621,12 +622,12 @@ def inputToAtomDict(molecularDataFrame, disable = False, M1Only = False):
     
     return byAtom
 
-def massSelections(atomDictionary, massThreshold = 4):
+def massSelections(isotopologueDictionary, massThreshold = 4):
     """
-    Takes a by-atom isotopologue dictionary and pulls out only those isotopologues with a cardinal mass increase <= massThreshold. 
+    Takes a by atom or by sub isotopologue dictionary and pulls out only those isotopologues with a cardinal mass increase <= massThreshold. 
 
     Args:
-        atomDictionary (dict[str, dict]): Output of :func:`calcAtomDictionary`.
+        isotopologueDictionary (dict[str, dict]): Either an atom or sub dictionary; the output of :func:`inputToAtomDict` or :func:`subDictionaryFromAtom`.
         massThreshold (int, optional): Highest mass class to include. Defaults to
             ``4``.
 
@@ -641,32 +642,65 @@ def massSelections(atomDictionary, massThreshold = 4):
         >>> atomDict = ci.inputToAtomDict(molecular_df, disable = False, M1Only = False)
         >>> selectedIsotopologues = ci.massSelections(atomDict, massThreshold=2)
         >>> selectedIsotopologues
-
         'M0': {'0000': {'Number': 1,
-        'Full': '(0, 0)00',
+            'Full': '(0, 0)00',
+            'Conc': 0.9275321060832549,
+            'Mass': 0,
+            'Subs': ''}},
+            'M1': {'0001': {'Number': 1,
+            'Full': '(0, 0)01',
+            'Conc': 0.0073061703996178,
+            'Mass': 1,
+            'Subs': '33S'},
+            '0010': {'Number': 1,
+            'Full': '(0, 0)10',
+            'Conc': 0.0003523694471010285,
+            'Mass': 1,
+            'Subs': '17O'},
+            '0100': {'Number': 2,
+            'Full': '(0, 1)00',
+            'Conc': 0.020532221713101362,
+            'Mass': 1,
+            'Subs': '13C'}},
+            'M2': {'0002': {'Number': 1,
+            'Full': '(0, 0)02',
+            'Conc': 0.04096222938811236,
+            'Mass': 2,
+            'Subs': '34S'},
+            ...
+
+    >>> import pandas as pd
+    >>> from isotomics import calcIsotopologues as ci
+    >>> molecular_df = pd.DataFrame({'IDS': ['C', 'O','S'], 'Number': [2, 1,1], 'deltas': [-10, 0,0]})
+    >>> atomDict = ci.inputToAtomDict(molecular_df, disable = False, M1Only = False)
+    >>> subDict = ci.subDictionaryFromAtom(atomDict)
+    >>> selectedIsotopologues = ci.massSelections(subDict, massThreshold=2)
+    >>> selectedIsotopologues
+    {'M0': {'': {'Number': 1,
+        'Full': ['(0, 0)00'],
         'Conc': 0.9275321060832549,
         'Mass': 0,
-        'Subs': ''}},
-        'M1': {'0001': {'Number': 1,
-        'Full': '(0, 0)01',
+        'ATOM': ['0000']}},
+        'M1': {'33S': {'Number': 1,
+        'Full': ['(0, 0)01'],
         'Conc': 0.0073061703996178,
         'Mass': 1,
-        'Subs': '33S'},
-        '0010': {'Number': 1,
-        'Full': '(0, 0)10',
+        'ATOM': ['0001']},
+        '17O': {'Number': 1,
+        'Full': ['(0, 0)10'],
         'Conc': 0.0003523694471010285,
         'Mass': 1,
-        'Subs': '17O'},
-        '0100': {'Number': 2,
-        'Full': '(0, 1)00',
+        'ATOM': ['0010']},
+        '13C': {'Number': 2,
+        'Full': ['(0, 1)00'],
         'Conc': 0.020532221713101362,
         'Mass': 1,
-        'Subs': '13C'}},
-        'M2': {'0002': {'Number': 1,
-        'Full': '(0, 0)02',
+        'ATOM': ['0100']}},
+        'M2': {'34S': {'Number': 1,
+        'Full': ['(0, 0)02'],
         'Conc': 0.04096222938811236,
         'Mass': 2,
-        'Subs': '34S'},
+        'ATOM': ['0002']},
         ...
     """
     MNDict = {}
@@ -674,7 +708,7 @@ def massSelections(atomDictionary, massThreshold = 4):
     for i in range(massThreshold+1):
         MNDict['M' + str(i)] = {}
         
-    for i, v in atomDictionary.items():
+    for i, v in isotopologueDictionary.items():
         for j in range(massThreshold+1):
             if v['Mass'] == j:
                 MNDict['M' + str(j)][i] = v

@@ -1,4 +1,4 @@
-# Isotomics-Automated
+# Isotomics
 
 `isotomics` provides tools for M+1 Orbitrap-IRMS workflows:
 - simulate expected precision for proposed experiments
