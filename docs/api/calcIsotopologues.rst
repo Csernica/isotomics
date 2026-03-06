@@ -7,3 +7,4 @@ isotomics.calcIsotopologues
 .. autofunction:: isotomics.calcIsotopologues.inputToAtomDict
 .. autofunction:: isotomics.calcIsotopologues.subDictionaryFromAtom
 .. autofunction:: isotomics.calcIsotopologues.massSelections
+.. autofunction:: isotomics.calcIsotopologues.strSiteElements

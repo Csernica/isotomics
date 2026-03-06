@@ -2,6 +2,10 @@ isotomics.fragmentAndSimulate
 =============================
 
 .. automodule:: isotomics.fragmentAndSimulate
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   :no-members:
+
+.. autofunction:: isotomics.fragmentAndSimulate.calculateUValues
+.. autofunction:: isotomics.fragmentAndSimulate.expandFrag
+.. autofunction:: isotomics.fragmentAndSimulate.fragmentIsotopologueDict
+.. autofunction:: isotomics.fragmentAndSimulate.computeSubs
+.. autofunction:: isotomics.fragmentAndSimulate.computeMass

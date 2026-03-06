@@ -242,18 +242,16 @@ def simulateMeasurement(initializedMolecule, abundanceThreshold = 0, UValueList 
         byAtom = addClumps(byAtom, molecularDataFrame, clumpD)
 
     #bySub is an representation of data, a dictionary where keys are substitutions (e.g., '13C'), and values are their abundances. 
-    bySub = ci.subDictionaryFromAtom(byAtom, molecularDataFrame)
-    
-    #Initialize Measurement output
-    allMeasurementInfo = {}
-    allMeasurementInfo = fas.UValueMeasurement(bySub, allMeasurementInfo, massThreshold = massThreshold,subList = UValueList)
+    bySub = ci.subDictionaryFromAtom(byAtom)
+    uValues = fas.calculateUValues(bySub, massThreshold = massThreshold,subList = UValueList)
 
     MN = ci.massSelections(byAtom, massThreshold = massThreshold)
     MN = fas.trackMNFragments(MN, expandedFrags, fragSubgeometryKeys, molecularDataFrame, unresolvedDict = unresolvedDict)
         
-    predictedMeasurement, fractionationFactors = fas.predictMNFragmentExpt(allMeasurementInfo, MN, expandedFrags, fragSubgeometryKeys, molecularDataFrame, 
-                                                 fragmentationDictionary, calcFF = calcFF, ffstd = ffstd,
-                                                 abundanceThreshold = abundanceThreshold, fractionationFactors = fractionationFactors, omitMeasurements = omitMeasurements, unresolvedDict = unresolvedDict, outputFull = outputFull)
+    predictedMeasurement, fractionationFactors = fas.predictMNFragmentExpt(MN, molecularDataFrame,
+                                                  fragmentationDictionary, calcFF = calcFF, ffstd = ffstd,
+                                                  abundanceThreshold = abundanceThreshold, fractionationFactors = fractionationFactors, omitMeasurements = omitMeasurements, unresolvedDict = unresolvedDict, outputFull = outputFull)
+    predictedMeasurement['U Values'] = uValues
     
     if outputPath != None:
         output = json.dumps(predictedMeasurement)

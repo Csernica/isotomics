@@ -31,6 +31,9 @@ Output files are written to your current working directory.
 
 Each row describes one constrained site.
 
+Current isotope support is hardcoded in both `isotomics/basicDeltaOperations.py` and `isotomics/fragmentAndSimulate.py`.
+Available elements are currently: `C`, `N`, `H`, `O`, and `S`.
+
 Required columns:
 - `Site Names`
 - `Element`

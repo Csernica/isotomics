@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from types import MappingProxyType
 
 '''
 This code takes care of basic manipulations between delta, ratio, and concentration space. Currently, it works for H, C, N, O, and S. 
@@ -10,6 +11,46 @@ This code takes care of basic manipulations between delta, ratio, and concentrat
 #Doubly isotopic atoms are given as standard ratios. The standards are: VPDB for carbon, AIR for nitrogen, VSMOW for H/O, and CDT for sulfur. 
 STD_Rs = {"H": 0.00015576, "C": 0.011180, "N": 0.003676, "17O": 0.0003799, "18O": 0.0020052,
          "33S":0.007877,"34S":0.0441626,"36S":0.000105274}
+
+# Isotope metadata used across the package for label and exact-mass lookup.
+# Keying by integer cardinal mass code avoids repeated string casting.
+ISOTOPE_DATA = MappingProxyType({
+    "C": MappingProxyType({
+        0: MappingProxyType({"label": "", "mass": 12.0}),
+        1: MappingProxyType({"label": "13C", "mass": 13.00335484}),
+    }),
+    "N": MappingProxyType({
+        0: MappingProxyType({"label": "", "mass": 14.003074}),
+        1: MappingProxyType({"label": "15N", "mass": 15.00010889}),
+    }),
+    "H": MappingProxyType({
+        0: MappingProxyType({"label": "", "mass": 1.007825032}),
+        1: MappingProxyType({"label": "D", "mass": 2.014101778}),
+    }),
+    "O": MappingProxyType({
+        0: MappingProxyType({"label": "", "mass": 15.99491462}),
+        1: MappingProxyType({"label": "17O", "mass": 16.99913175}),
+        2: MappingProxyType({"label": "18O", "mass": 17.9991596}),
+    }),
+    "S": MappingProxyType({
+        0: MappingProxyType({"label": "", "mass": 31.97207117}),
+        1: MappingProxyType({"label": "33S", "mass": 32.9714589}),
+        2: MappingProxyType({"label": "34S", "mass": 33.96786701}),
+        4: MappingProxyType({"label": "36S", "mass": 35.9670807}),
+    }),
+})
+
+def _normalize_mass_code(mass_code):
+    """Normalize isotope mass code to int (supports int/str inputs)."""
+    return int(mass_code)
+
+def isotope_label(element, mass_code):
+    """Return isotope label for an element and cardinal mass code."""
+    return ISOTOPE_DATA[element][_normalize_mass_code(mass_code)]["label"]
+
+def isotope_mass(element, mass_code):
+    """Return exact isotope mass for an element and cardinal mass code."""
+    return ISOTOPE_DATA[element][_normalize_mass_code(mass_code)]["mass"]
     
 def deltaToConcentration(atomIdentity,delta):
     """
