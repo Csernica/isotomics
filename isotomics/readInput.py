@@ -29,7 +29,7 @@ def readComputedData(JSONInput, error = 0, theory = {}):
     process = {}
     for massSelection, massSelectionData in JSONInput.items():
         #skip non MN measurements
-        if massSelection != 'Full Molecule' and massSelection != "M0":
+        if massSelection != 'U Values' and massSelection != "M0":
             process[massSelection] = {}
             for fragKey, fragData in massSelectionData.items():
                 process[massSelection][fragKey] = {'Subs':[],
@@ -75,13 +75,13 @@ def readComputedUValues(JSONInput, error = 0, UMNSub = '13C'):
     UValues = {}
     if isinstance(error, float):
         # If input_value is a float, multiply every value in k by input_value
-        for subKey, subValue in JSONInput['Full Molecule'].items():
+        for subKey, subValue in JSONInput['U Values'].items():
             if subKey == UMNSub:
                 UValues[subKey] = {'Observed':subValue,'Error':subValue * error}
 
     elif isinstance(error, dict):
         # If input_value is a dictionary, iterate through k and multiply by the corresponding value
-        for subKey, subValue in JSONInput['Full Molecule'].items():
+        for subKey, subValue in JSONInput['U Values'].items():
             if subKey == UMNSub:
                 if subKey in error:
                     UValues[subKey] = {'Observed':subValue,'Error':subValue * error[subKey]}

@@ -233,8 +233,6 @@ def simulateMeasurement(initializedMolecule, abundanceThreshold = 0, UValueList 
     '''
     #Unpack initialized molecule dictionary
     molecularDataFrame = initializedMolecule['molecularDataFrame']
-    expandedFrags = initializedMolecule['expandedFrags']
-    fragSubgeometryKeys = initializedMolecule['fragSubgeometryKeys']
     fragmentationDictionary = initializedMolecule['fragmentationDictionary']
 
     byAtom = ci.inputToAtomDict(molecularDataFrame, disable = disableProgress)
@@ -246,7 +244,7 @@ def simulateMeasurement(initializedMolecule, abundanceThreshold = 0, UValueList 
     uValues = fas.calculateUValues(bySub, massThreshold = massThreshold,subList = UValueList)
 
     MN = ci.massSelections(byAtom, massThreshold = massThreshold)
-    MN = fas.trackMNFragments(MN, expandedFrags, fragSubgeometryKeys, molecularDataFrame, unresolvedDict = unresolvedDict)
+    MN = fas.trackMNFragments(MN, molecularDataFrame, fragmentationDictionary, unresolvedDict = unresolvedDict)
         
     predictedMeasurement, fractionationFactors = fas.predictMNFragmentExpt(MN, molecularDataFrame,
                                                   fragmentationDictionary, calcFF = calcFF, ffstd = ffstd,

@@ -277,11 +277,11 @@ def predictMNFragmentExpt(MNDict, molecularDataFrame, fragmentationDictionary, a
 
         abundanceThreshold: Does not include measurements below a certain relative abundance, i.e. assuming they will not be  measured due to low abundance. 
         omitMeasurements: A dictionary, {}, specifying measurements which I will not observed. For example, omitMeasurements = {'M1':{'61':'D'}} would mean I do not observe the D ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance. 
-        fractionationFactors: A dictionary, specifying a fractionation factor to apply to each ion beam. This is used to apply fractionation factors calculated previously to this predicted measurement (e.g. for a sample/standard comparison with the same experimental fractionation). 
+        fractionationFactors: A dictionary, specifying a fractionation factor to apply to each ion beam. This is used to apply fractionation factors calculated previously to this predicted measurement (e.g. for a sample/standard comparison with the same experimental fractionation). The workflow is: run once with fractionationFactors = None,  calcFF = True and your chosen ffstd. Then get the results from the calculatedFF output to this function. In the future, set fractionationFactors = calculatedFF, and set calcFF = False. Then you will have the same fractionation factors for both simulations. 
         calcFF: A boolean, specifying whether new fractionation factors should be calculated via this function. If True, fractionFactors should be left empty. 
         ffstd: A float. If new fractionation factors are calculated, they are generated from a normal distribution with mean 1 and standard deviation of ffstd. 
         randomseed: An integer. If new fractionation factors are calculated, we initialize this random seed; this allows us to generate the same factors if we run multiple times. 
-        unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other. 
+        unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other. The format looks like: {"M1":{'full': {'17O': '13C'}}} where the 17O abundance is assigned to the 13C ion beam. Fill in other fragments and M+N experiments as desired. 
         outputFull: A boolean. Typically False, in which case beams that are not observed are culled from the output. If True, includes this information; this should only be used for debugging, and will break the solver routine. 
 
     Returns: 
@@ -365,19 +365,18 @@ def predictMNFragmentExpt(MNDict, molecularDataFrame, fragmentationDictionary, a
                     
             predictedMeasurement[massSelection][fragSubgeometryKeys[j]] = predictSpectrum
     
-    predictedMeasurement = combineFragmentSubgeometries(predictedMeasurement, fragmentationDictionary)
+    predictedMeasurement = combineFragmentSubgeometries(predictedMeasurement)
     
     predictedMeasurement = computeMNRelAbundances(predictedMeasurement, omitMeasurements = omitMeasurements, abundanceThreshold = abundanceThreshold, unresolvedDict = unresolvedDict, outputFull = outputFull)
                              
     return predictedMeasurement, calculatedFF
 
-def combineFragmentSubgeometries(allMeasurementInfo, fragmentationDictionary):
+def combineFragmentSubgeometries(allMeasurementInfo):
     '''
     Takes fragments with multiple subgeometries and combines their measurements. For example, if frag 82 is made via 82_01 (relCont = 0.4) and 82_02 (relCont = 0.6) this function adds the values of these subfragments to give the actual measurement. 
     
     Args:
         allMeasurementInfo: A dictionary containing information about the measurement including fragment subgeometries.
-        fragmentationDictionary: A dictionary giving information about the fragments and their subgeometries. 
 
     Returns:
         combinedAllMeasurementInfo: A dictionary containing information about the measurement including only full fragments. 
@@ -431,90 +430,105 @@ def computeMNRelAbundances(allMeasurementInfo, omitMeasurements = None, abundanc
 
     for massSelection, fragmentData in allMeasurementInfo.items():
         #only take MN experiments
-        if massSelection[0] == 'M':
-            #By fragment
-            for fragKey, isotopicData in fragmentData.items():
-                #compute relative abundance of each substitution
-                totalAbundance = 0
-                
-                #Get abundance of each sub
-                for isotopicSub, subData in isotopicData.items():
-                    totalAbundance += subData['Abs. Abundance']
-            
-                #compute relative abundances
-                for isotopicSub, subData in isotopicData.items():
-                    subData['Rel. Abundance'] = subData['Abs. Abundance'] / totalAbundance
-                
-                #Coalescing peaks--if we are moving abundance from one substitution to another
-                for isotopicSub, subData in isotopicData.items():
-                    #check to see if we have to 
-                    try:
-                        #if we do, set the coalesced relative abundance of the old sub to 0
-                        newSub = unresolvedDict[massSelection][fragKey][isotopicSub]
-                        subData['Combined Rel. Abundance'] = 0
-                    except:
-                        newSub = isotopicSub
-                        
-                    #Then find the new substitution
-                    newSubData = allMeasurementInfo[massSelection][fragKey][newSub]
-                    
-                    #Add the old subs relative abundance to the new sub
-                    if 'Combined Rel. Abundance' not in newSubData:
-                        newSubData['Combined Rel. Abundance'] = subData['Rel. Abundance']
-                    else:
-                        newSubData['Combined Rel. Abundance'] += subData['Rel. Abundance']
-                            
-                #Calculate adjusted relative abundance, which does not include contributions from peaks below some
-                #threshold
-                shortSpectrum = {}
-                totalRelAbund = 0
-                try:
-                    forbiddenPeaks = omitMeasurements[massSelection][fragKey]
-                except:
-                    forbiddenPeaks = []
+        if not massSelection.startswith('M'):
+            continue
 
-                for isotopicSub, subData in isotopicData.items():
-                    #If the peak is observed, count it
-                    if subData['Combined Rel. Abundance'] > abundanceThreshold and isotopicSub not in forbiddenPeaks:
-                        shortSpectrum[isotopicSub] = subData
-                        totalRelAbund += subData['Combined Rel. Abundance']
-                    #Otherwise, either 1) set Adj. Rel. Abundance to 0, keeping it in the spectrum or
-                    #                  2) cull it from the spectrum 
-                    else:
-                        if outputFull:
-                            shortSpectrum[isotopicSub] = subData
-                            shortSpectrum[isotopicSub]['Adj. Rel. Abundance'] = 0
+        #By fragment
+        for fragKey, isotopicData in fragmentData.items():
+            #compute relative abundance of each substitution
+            totalAbundance = sum(subData['Abs. Abundance'] for subData in isotopicData.values())
+            for subData in isotopicData.values():
+                subData['Rel. Abundance'] = subData['Abs. Abundance'] / totalAbundance
+                subData['Combined Rel. Abundance'] = 0
 
-                #calculate adj. rel. abundance for the qualifying peaks
-                for isotopicSub, subData in shortSpectrum.items():
+            #Unresolved peaks--if we are moving abundance from one substitution to another
+            unresolvedFrag = unresolvedDict.get(massSelection, {}).get(fragKey, {})
+            for isotopicSub, subData in isotopicData.items():
+                newSub = unresolvedFrag.get(isotopicSub, isotopicSub)
+                isotopicData[newSub]['Combined Rel. Abundance'] += subData['Rel. Abundance']
+
+            #Calculate adjusted relative abundance, which does not include contributions from peaks below some
+            #threshold
+            shortSpectrum = {}
+            totalRelAbund = 0
+            forbiddenPeaks = omitMeasurements.get(massSelection, {}).get(fragKey, [])
+
+            for isotopicSub, subData in isotopicData.items():
+                #If the peak is observed, count it
+                if subData['Combined Rel. Abundance'] > abundanceThreshold and isotopicSub not in forbiddenPeaks:
+                    shortSpectrum[isotopicSub] = subData
+                    totalRelAbund += subData['Combined Rel. Abundance']
+                #Otherwise, either 1) set Adj. Rel. Abundance to 0, keeping it in the spectrum or
+                #                  2) cull it from the spectrum 
+                elif outputFull:
+                    shortSpectrum[isotopicSub] = subData
+                    shortSpectrum[isotopicSub]['Adj. Rel. Abundance'] = 0
+
+            #calculate adj. rel. abundance for the qualifying peaks
+            if totalRelAbund > 0:
+                for subData in shortSpectrum.values():
                     #If we added adj. rel. abundance = 0 the previous step, we don't want to repeat that calculation
                     if 'Adj. Rel. Abundance' not in subData:
                         subData['Adj. Rel. Abundance'] = subData['Combined Rel. Abundance'] / totalRelAbund
-                    
-                allMeasurementInfo[massSelection][fragKey] = shortSpectrum
+                
+            allMeasurementInfo[massSelection][fragKey] = shortSpectrum
                 
     return allMeasurementInfo
 
-def trackMNFragments(MN, expandedFrags, fragSubgeometryKeys, molecularDataFrame, unresolvedDict = None):
+def trackMNFragments(MN, molecularDataFrame, fragmentationDictionary, unresolvedDict = None):
     '''
-    Fragments and tracks isotopologues across a range of mass selections and fragments. 
+    Fills in a mass selected, by atom isotopologue dictionary (obtained via :func:`calcIsotopologues.massSelections` applied to :func:`calcIsotopologues.inputToAtomDict`) with information about how each isotopolgoue fragments. 
     
     Args:
         MN: A dictionary, where the key is an MNKey and the values give information about all isotopologues associated with that mass selection. 
-        expandedFrags: A list of the expanded fragments
-        fragSubgeometryKeys: A list of the fragment subgeometry keys 
         molecularDataFrame: The initial dataframe with information about the molecule
-        unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other. 
+        fragmentationDictionary: A dictionary giving information about the fragments and their subgeometries.
+        unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other. The format looks like: {"M1":{'full': {'17O': '13C'}}} where the 17O abundance is assigned to the 13C ion beam. Fill in other fragments and M+N experiments as desired. 
 
     Returns:
         MN: The same dictionary, with information about fragmentation added. 
 
     Example:
-        >>> # add example
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> from isotomics import fragmentAndSimulate as fas
+        >>> molecular_df = pd.DataFrame({'IDS': ['C', 'O', 'S'], 'Number': [2, 1, 1], 'deltas': [-10, 0, 0]})
+        >>> byAtom = ci.inputToAtomDict(molecular_df, disable=True, M1Only=False)
+        >>> MN = ci.massSelections(byAtom, massThreshold=1)
+        >>> fragment_by_site = [1, 'x', 1]
+        >>> fragmentationDictionary = {'frag': {'01': {'subgeometry': fragment_by_site, 'relCont': 1}}}
+        >>> tracked = fas.trackMNFragments(MN, molecular_df, fragmentationDictionary)
+        >>> tracked
+        {'M0': {'0000': {'Number': 1,
+        'Full': '(0, 0)00',
+        'Conc': 0.9275321060832549,
+        'Mass': 0,
+        'Subs': '',
+        'Stochastic U': 1.0,
+        'frag_01 Identity': '00x0',
+        'frag_01 Subs': 'Unsub'}},
+        'M1': {'0001': {'Number': 1,
+        'Full': '(0, 0)01',
+        'Conc': 0.0073061703996178,
+        'Mass': 1,
+        'Subs': '33S',
+        'Stochastic U': 0.007877,
+        'frag_01 Identity': '00x1',
+        'frag_01 Subs': '33S'},
+        '0010': {'Number': 1,
+        'Full': '(0, 0)10',
+        'Conc': 0.0003523694471010285,
+        'Mass': 1,
+        'Subs': '17O',
+        'Stochastic U': 0.00037989999999999996,
+        'frag_01 Identity': '00x0',
+        'frag_01 Subs': 'Unsub'},
+        ...
     '''
     if unresolvedDict is None:
         unresolvedDict = {}
 
+    expandedFrags, fragSubgeometryKeys = _fragment_representations(fragmentationDictionary, molecularDataFrame)
     unsubString = list(MN['M0'].keys())[0]
     UnsubConc = MN['M0'][unsubString]['Conc']
 
@@ -578,7 +592,23 @@ def isotopologueDataFrame(MNDictionary, molecularDataFrame):
         isotopologuesDict: A dictionary where the keys are "M0", "M1", etc. and the values are dataFrames giving the isotopologues with those substitutions. 
 
     Example:
-        >>> # add example
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> from isotomics import fragmentAndSimulate as fas
+        >>> molecular_df = pd.DataFrame(
+        ...     {'IDS': ['C', 'O', 'S'], 'Number': [2, 1, 1], 'deltas': [-10, 0, 0]},
+        ...     index=['C1', 'O1', 'S1'],
+        ... )
+        >>> byAtom = ci.inputToAtomDict(molecular_df, disable=True, M1Only=False)
+        >>> MNDict = ci.massSelections(byAtom, massThreshold=1)
+        >>> fragmentationDictionary = {'frag': {'01': {'subgeometry': [1, 'x', 1], 'relCont': 1}}}
+        >>> MNDict = fas.trackMNFragments(MNDict, molecular_df, fragmentationDictionary)
+        >>> isotopologuesDict = fas.isotopologueDataFrame(MNDict, molecular_df)
+        >>> print(isotopologuesDict['M1'][['Composition', 'Precise Identity']].head(3).to_string())
+             Composition Precise Identity
+        0100         13C           13C C1
+        0010         17O           17O O1
+        0001         33S           33S S1
     '''
     
     isotopologuesDict = {}
@@ -611,12 +641,11 @@ def isotopologueDataFrame(MNDictionary, molecularDataFrame):
 
 def predictTraditionalMeasurement(molecularDataFrame, atomFrag, byAtom):
     '''
-    Currently a shell compared to predictMNFragmentation. Occasionally, it will be worthwhile for the user to simulate a 'traditional' fragmentation measurement (i.e., without mass selection). This implements that and returns a dictionary where keys are substitutions and values are the abundances. 
+    Often, you may want to predict a 'traditional' MS measurement, i.e., one where you fragment and observe all isotopologues rather than a selected subset. This function accomplishes that and returns a dictionary where keys are substitutions and values are the abundances.
 
-    Less developed; it does not account for fractionation and the like and is not integrated into any other routines. I include it here in case a user wants to know how to implement this. 
+    Currently, this is a simple function and takes a single fragment as input. 
 
-    Currently applies to one fragment at a time. Need to build a loop for multiple fragments. 
-
+    
     Args:
         molecularDataFrame: Basic information about the molecule. 
         atomFrag: The ATOM depiction of the fragment
@@ -626,7 +655,32 @@ def predictTraditionalMeasurement(molecularDataFrame, atomFrag, byAtom):
         predictSpectrum: A dictionary. Keys are subKeys (e.g., 'D-D-13C') and values are the abundances of those after fragmentation. 
 
     Example:
-        >>> # add example
+        >>> import pandas as pd
+        >>> from isotomics import calcIsotopologues as ci
+        >>> from isotomics import fragmentAndSimulate as fas
+
+        >>> molecular_df = pd.DataFrame(
+            {'IDS': ['C', 'O', 'S'], 'Number': [2, 1, 1], 'deltas': [-10, 0, 0]},
+            index=['C1', 'O1', 'S1'],
+        )
+
+        >>> byAtom = ci.inputToAtomDict(molecular_df, disable=True, M1Only=False)
+        >>> atomFrag = fas.expandFrag([1, 'x', 1], molecular_df['Number'])
+
+        >>> predictSpectrum = fas.predictTraditionalMeasurement(molecular_df, atomFrag, byAtom)
+        >>> predictSpectrum
+        {'Unsub': {'Abs. Abundance': 0.929744362909474},
+            '33S': {'Abs. Abundance': 0.007323596346637928},
+            '34S': {'Abs. Abundance': 0.041059928401425944},
+            '36S': {'Abs. Abundance': 9.787790806093197e-05},
+            '13C': {'Abs. Abundance': 0.02058119311510928},
+            '13C-33S': {'Abs. Abundance': 0.0001621180581677158},
+            '13C-34S': {'Abs. Abundance': 0.0009089189990653254},
+            '13C-36S': {'Abs. Abundance': 2.1666645240000144e-06},
+            '13C-13C': {'Abs. Abundance': 0.00011389838081832625},
+            '13C-13C-33S': {'Abs. Abundance': 8.97177545705956e-07},
+            '13C-13C-34S': {'Abs. Abundance': 5.030048632727416e-06},
+            '13C-13C-36S': {'Abs. Abundance': 1.199053814226848e-08}}
     '''
     predictSpectrum = {}
     siteElements = ci.strSiteElements(molecularDataFrame)

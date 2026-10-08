@@ -9,3 +9,7 @@ isotomics.fragmentAndSimulate
 .. autofunction:: isotomics.fragmentAndSimulate.fragmentIsotopologueDict
 .. autofunction:: isotomics.fragmentAndSimulate.computeSubs
 .. autofunction:: isotomics.fragmentAndSimulate.computeMass
+.. autofunction:: isotomics.fragmentAndSimulate.predictMNFragmentExpt
+.. autofunction:: isotomics.fragmentAndSimulate.trackMNFragments
+.. autofunction:: isotomics.fragmentAndSimulate.isotopologueDataFrame
+.. autofunction:: isotomics.fragmentAndSimulate.predictTraditionalMeasurement
