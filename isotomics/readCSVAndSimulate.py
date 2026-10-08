@@ -286,7 +286,7 @@ def plotOutput(simulationOutput, relativeDeltasActual = None, ylim = False):
     plt.legend()
     ax.set_xticks(range(len(computedDeltas)))
     ax.set_xticklabels(simulationOutput.index, rotation = 45)
-    ax.set_ylabel("$\delta_{STD}$")
+    ax.set_ylabel(r"$\delta_{STD}$")
     if ylim:
         ax.set_ylim(*ylim)
 

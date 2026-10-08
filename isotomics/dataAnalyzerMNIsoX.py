@@ -123,7 +123,7 @@ def combine_Substituted_Peaks(splitDf, cullOn = None, cullAmt = 3, scanNumber = 
         if subIdx == 0:
             baseDf = copy.deepcopy(subData)
         else:
-            subData.drop(columns=['filename','retTime','compound','isotopolog','tic','TIC*IT','integTime','resolution','agcTarget','microscans'],axis = 1, inplace=True)
+            subData.drop(columns=['filename','retTime','compound','isotopolog','tic','TIC*IT','integTime','resolution','agcTarget','microscans'], inplace=True)
 
             baseDf = pd.merge_ordered(baseDf, subData,on='scanNumber',suffixes =(False,False))
 

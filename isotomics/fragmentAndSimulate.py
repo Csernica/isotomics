@@ -103,8 +103,8 @@ def expandFrag(siteDepict, numberAtSite):
         [1, 1, 'x', 1]
     '''
     atomDepict = []
-    for i, v in enumerate(siteDepict):
-        atomDepict += [v] * numberAtSite[i]
+    for v, n in zip(siteDepict, numberAtSite):
+        atomDepict += [v] * n
     
     return atomDepict
 
