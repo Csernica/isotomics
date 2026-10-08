@@ -67,17 +67,22 @@ This is the dataset used by the quickstart command.
 
 ## Citation
 
-Csernica, Timothy and Zeichner, Sarah S. (2026).  
-Csernica/isotomics.
+If you use `isotomics`, please cite the method papers:
 
+- Csernica, T. and Eiler, J. M. (2023). High-dimensional isotomics, part 1: A mathematical framework for isotomics. *Chemical Geology*, 617, 121235. [doi:10.1016/j.chemgeo.2022.121235](https://doi.org/10.1016/j.chemgeo.2022.121235)
+- Weiss, G. M., Sessions, A. L., Julien, M., Csernica, T., Yamada, K., Gilbert, A., Freeman, K. H., and Eiler, J. M. (2023). Analysis of intramolecular carbon isotope distributions in alanine by electrospray ionization Orbitrap mass spectrometry. *International Journal of Mass Spectrometry*, 493, 117128. [doi:10.1016/j.ijms.2023.117128](https://doi.org/10.1016/j.ijms.2023.117128) (source of the bundled alanine example dataset)
 
+and the software:
+
+- Csernica, T. and Zeichner, S. S. (2026). isotomics. https://github.com/Csernica/isotomics
 
 ## Documentation
 
-Build docs locally:
+Full documentation, including tutorials and the API reference, is at https://isotomics.readthedocs.io.
+
+To build the docs locally:
 
 ```bash
 pip install -e .[docs]
-cd docs
-make.bat
+sphinx-build -b html docs docs/_build/html
 ```
