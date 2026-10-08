@@ -21,3 +21,12 @@ conda-bld/
 Thumbs.db
 .vscode/
 
+
+# Sphinx build output (ReadTheDocs builds its own)
+docs/_build/
+
+# Outputs written to the repo root when running the example notebook
+/M1Output.csv
+/all_data_output.csv
+/molecular_model_output.csv
+/Isotopologue tsv files/

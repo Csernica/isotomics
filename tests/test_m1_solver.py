@@ -1,4 +1,4 @@
-from pathlib import Path
+from importlib import resources
 
 import numpy as np
 
@@ -7,22 +7,23 @@ from isotomics import organizeData
 from isotomics import solveExperimentalData
 
 
-def test_m1_solver_smoke():
-    repo_root = Path(__file__).resolve().parents[1]
-    cwd = repo_root
-    molecule_input_path = "Input Data/Example_Molecule_Input.csv"
+def test_m1_solver_smoke(tmp_path, monkeypatch):
+    # Read the example data bundled with the package; write all outputs to a temp dir.
+    monkeypatch.chdir(tmp_path)
+    input_root = resources.files("isotomics").joinpath("input_data")
+    molecule_input_path = str(input_root / "Example_Molecule_Input.csv")
     standard_delta_approx = [-11.9, -9.95, 0, 0, 0, 0]
 
     fragment_folder_paths = organizeData.get_subfolder_paths(
-        str(repo_root / "Input Data" / "Experimental_Data")
+        str(input_root / "Experimental_Data")
     )
     rtn_means, _ = data_analyzer.processIndividualAndAverageIsotopeRatios(
         fragment_folder_paths,
-        cwd,
+        tmp_path,
         outputToCSV=True,
         csvOutputPath="all_data_output.csv",
         file_extension=(".isox",),
-        processed_data_subfolder="Input Data",
+        processed_data_subfolder=".",
         time_bounds=(5, 15),
         peakDriftScreen=True,
         peakDriftThreshold=2,
@@ -33,7 +34,7 @@ def test_m1_solver_smoke():
 
     output_df = solveExperimentalData.experimentalDataM1(
         rtn_means,
-        cwd,
+        tmp_path,
         molecule_input_path,
         standard_delta_approx,
         UValue="13C/Unsub",
@@ -54,5 +55,5 @@ def test_m1_solver_smoke():
     assert output_df["Standard Delta Values in CRF"].tolist() == standard_delta_approx
     assert np.isfinite(output_df["CRF Deltas"]).all()
     assert np.isfinite(output_df["CRF Deltas Error"]).all()
-    assert (repo_root / "M1Output.csv").exists()
-    assert (repo_root / "Input Data" / "all_data_output.csv").exists()
+    assert (tmp_path / "M1Output.csv").exists()
+    assert (tmp_path / "all_data_output.csv").exists()
