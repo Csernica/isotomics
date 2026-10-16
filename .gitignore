@@ -30,3 +30,8 @@ docs/_build/
 /all_data_output.csv
 /molecular_model_output.csv
 /Isotopologue tsv files/
+docs/tutorials/*.csv
+docs/tutorials/Isotopologue tsv files/
+
+# Local virtual environment
+.venv/

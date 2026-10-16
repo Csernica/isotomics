@@ -42,7 +42,8 @@ test = [
 ]
 docs = [
   "sphinx>=7.0",
-  "myst-parser>=2.0",]
+  "myst-nb>=1.1",
+]
 
 [project.scripts]
 isotomics-quickstart = "isotomics.quickstart:main"
