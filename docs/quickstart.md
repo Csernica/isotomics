@@ -42,6 +42,9 @@ Saved plot: M1Output.png
 
 It writes three files: `all_data_output.csv`, `M1Output.csv` and `M1Output.png`.
 
+You will also see a warning that the deuterium label `D` was renamed to `2H`. This is expected:
+the bundled raw `.isox` files predate the `2H` label, and isotomics renames it when reading them.
+
 ## Output files
 
 ### `all_data_output.csv`: processed measurements
