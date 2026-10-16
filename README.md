@@ -42,6 +42,8 @@ Required columns:
 Fragment columns:
 - add one or more columns named like `Fragment 44`, `Fragment 133`, etc.
 - use `1` if the site is present in that fragment and `0` if absent
+- if a fragment forms by more than one pathway, give one column per pathway (`Fragment 82_01`, `Fragment 82_02`)
+  and add a final row named `Relative Contribution` with each pathway's share (summing to 1 per fragment)
 
 See the bundled example:
 - `isotomics/input_data/Example_Molecule_Input.csv`

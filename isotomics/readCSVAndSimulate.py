@@ -9,45 +9,54 @@ from . import basicDeltaOperations as op
 import json
 import copy
 
-def process_fragment_column(col, fragSubset, molecularDf, fragmentationDictionary, renameCols):
+#Name of the optional row in the input csv giving the relative contribution of each fragment subgeometry
+RELATIVE_CONTRIBUTION_ROW = 'Relative Contribution'
+
+def parseFragmentColumn(col):
+    '''
+    Splits a fragment column name into its fragment and subgeometry. A fragment formed by a single pathway is given as 'Fragment 44'; a fragment formed by several pathways has one column per pathway, 'Fragment 82_01', 'Fragment 82_02', etc.
+
+    Inputs:
+        col: A string, format like 'Fragment 44' or 'Fragment 82_01'.
+
+    Outputs:
+        fragKey, geometryNumber: e.g. ('44', '01') or ('82', '02').
+    '''
+    newName = col.split(' ')[1]
+    if '_' in newName:
+        fragKey, geometryNumber = newName.split('_')
+        return fragKey, geometryNumber
+    return newName, '01'
+
+def process_fragment_column(col, fragSubset, molecularDf, fragmentationDictionary, relContributions):
     '''
     Read and process a single fragment column. Helper function for moleculeFromCsv.
 
-    Inputs: 
-        col: A string, format like 'Fragment 44' or 'Fragment 44_01'.
+    Inputs:
+        col: A string, format like 'Fragment 44' or 'Fragment 82_01'.
         fragSubset: A list of fragment names, like ['44','full']
         molecularDf: The molecular DataFrame
         fragmentationDictionary: A dictionary specifying the fragments and their geometries
-        renameCols: A dictionary, where keys are the column names in the input csv and values are new desired column names for the molecular Dataframe
+        relContributions: A dictionary giving the relative contribution of each fragment column, e.g. {'Fragment 82_01': 0.4}. Columns not included default to 1.
 
     Outputs:
-        fragmentationDictionary, molecularDf, renameCols
+        fragmentationDictionary, molecularDf
 
-        All as above, but either filled with more information for frags in fragSubset (fragmentationDictionary and renameCols) or with information removed (molecularDf, if there are fragments not in 'fragSubset').     
+        As above, but either filled with this subgeometry (fragmentationDictionary, if its fragment is in fragSubset) or with the column removed (molecularDf, if it is not).
     '''
-    #Get just the fragment name
-    newName = col.split(' ')[1]
-    #fragments could be given as 44_01, 44_02, or just as 44; split into cases
-    if '_' not in newName:
-        #If the fragment is desired, fill in the dictionary
-        if newName in fragSubset:
-            fragmentationDictionary[newName] = {'01':{'subgeometry':list(molecularDf[col]),'relCont':1}}
-        #otherwise, drop it
-        else:
-            molecularDf.drop(columns=col, inplace=True)
+    fragKey, geometryNumber = parseFragmentColumn(col)
 
-    else:
-        #In this format, split into parent frag name and number
-        parentFrag, geometryNumber = newName.split('_')
-        #If the fragment is desired, fill in the dictionary
-        if parentFrag in fragSubset:
-            renameCols[col] = newName
-            fragmentationDictionary[parentFrag] = {geometryNumber:{'subgeometry':list(molecularDf[col]), 'relCont':1}}
-        #otherwise, drop it
-        else:
-            molecularDf.drop(columns=col, inplace=True)
+    #If the fragment is not desired, drop it
+    if fragKey not in fragSubset:
+        molecularDf.drop(columns=col, inplace=True)
+        return fragmentationDictionary, molecularDf
 
-    return fragmentationDictionary, molecularDf, renameCols
+    subgeometries = fragmentationDictionary.setdefault(fragKey, {})
+    if geometryNumber in subgeometries:
+        raise ValueError(f"Fragment {fragKey} subgeometry {geometryNumber} is defined more than once (column '{col}').")
+    subgeometries[geometryNumber] = {'subgeometry':list(molecularDf[col]), 'relCont':relContributions.get(col, 1)}
+
+    return fragmentationDictionary, molecularDf
 
 def otherFragmentReps(fragmentationDictionary, molecularDf):
     """
@@ -77,9 +86,12 @@ def moleculeFromCsv(path, deltas = False, fragSubset = None):
     '''
     Reads in a .csv file to get basic information about that molecule.
 
+    The .csv has one row per site, with columns 'Site Names', 'Element', 'Number Atoms', and one 'Fragment' column per fragment giving whether each site is retained (1) or lost (0). If a fragment forms by several pathways, give one column per pathway ('Fragment 82_01', 'Fragment 82_02') and add a final row named 'Relative Contribution' giving the share of the fragment formed by each pathway; these must sum to 1 for each fragment. Fragments with a single column default to 1.
+
     Inputs:
         path: a string locating the .csv, e.g. 'Example Input.csv'
-        fragSubset: A list of fragments to include. Defaults to None, in which case it is filled programatically to contain all fragments. 
+        deltas: A list of delta values, one for each site, in the order of the rows of the .csv.
+        fragSubset: A list of fragments to include. Defaults to None, in which case it is filled programatically to contain all fragments.
 
     Outputs:
         initializedMolecule: A dictionary, containing:
@@ -93,27 +105,39 @@ def moleculeFromCsv(path, deltas = False, fragSubset = None):
     molecularDf = pd.read_csv(path, index_col='Site Names')
     molecularDf.index.name = None
 
-    #Columns must be renamed from the input csv to the format the code expects. We add to this in 'process_fragment_column'.
-    renameCols = {'Element': 'IDS', 'Number Atoms': 'Number'}
-    molecularDf.rename(columns=renameCols, inplace=True)
+    #Columns must be renamed from the input csv to the format the code expects.
+    molecularDf.rename(columns={'Element': 'IDS', 'Number Atoms': 'Number'}, inplace=True)
+    fragCols = [col for col in molecularDf.columns if col.startswith('Fragment ')]
 
-    #Fill in programatically in the default case
-    if fragSubset == None:
-        fragSubset = [col.split(' ')[1] for col in molecularDf.columns if 'Fragment' in col]
+    #Pull out the optional relative contribution row, then restore integer columns (the extra row makes them read as floats)
+    relContributions = {}
+    if RELATIVE_CONTRIBUTION_ROW in molecularDf.index:
+        relRow = molecularDf.loc[RELATIVE_CONTRIBUTION_ROW]
+        relContributions = {col: float(relRow[col]) for col in fragCols if pd.notna(relRow[col])}
+        molecularDf = molecularDf.drop(index=RELATIVE_CONTRIBUTION_ROW)
+        molecularDf['Number'] = molecularDf['Number'].astype(int)
+        for col in fragCols:
+            molecularDf[col] = molecularDf[col].astype(int)
+
+    #Fill in programatically in the default case; 'Fragment 82_01' and 'Fragment 82_02' are both fragment '82'
+    if fragSubset is None:
+        fragSubset = list(dict.fromkeys(parseFragmentColumn(col)[0] for col in fragCols))
 
     #Fill a dictionary with the fragment information and which sites each fragment samples
     fragmentationDictionary = {}
-    for col in molecularDf.columns:
-        #get fragment columns
-        if 'Fragment' in col:
-            molecularDf[col] = molecularDf[col].replace(0, 'x')
-            fragmentationDictionary, molecularDf, renameCols = process_fragment_column(col, fragSubset, molecularDf, fragmentationDictionary, renameCols)
-        
-        #calculate some other objects relating to fragments that are used in computations
-        expandedFrags, fragSubgeometryKeys = otherFragmentReps(fragmentationDictionary, molecularDf)
+    for col in fragCols:
+        molecularDf[col] = molecularDf[col].replace(0, 'x')
+        fragmentationDictionary, molecularDf = process_fragment_column(col, fragSubset, molecularDf, fragmentationDictionary, relContributions)
 
-    #rename the columns
-    molecularDf.rename(columns=renameCols, inplace=True)
+    #The pathways forming each fragment must account for all of it
+    for fragKey, subgeometries in fragmentationDictionary.items():
+        total = sum(info['relCont'] for info in subgeometries.values())
+        if abs(total - 1) > 1e-6:
+            raise ValueError(f"The relative contributions of fragment {fragKey}'s subgeometries sum to {total:g}, but must sum to 1. "
+                             f"Add a '{RELATIVE_CONTRIBUTION_ROW}' row to the input csv giving each 'Fragment {fragKey}_NN' column's share.")
+
+    #calculate some other objects relating to fragments that are used in computations
+    expandedFrags, fragSubgeometryKeys = otherFragmentReps(fragmentationDictionary, molecularDf)
 
     molecularDf['deltas'] = deltas
     

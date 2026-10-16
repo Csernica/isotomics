@@ -373,16 +373,11 @@ def constructMatrix(Isotopologues, smp, MNKey, fragmentationDictionary, includeS
                 if sub not in omitSubs:
                     #If the observed intensity of a fragment is 0, we do not include it
                     if v != 0:
-                        cFull = []
+                        cFull = np.zeros(len(Isotopologues.index))
                         #The composition matrix may have contributions from multiple subgeometries
                         for subFrag, subFragInfo in fragInfo.items():
                             IsotopologueFragments = Isotopologues[fragKey + '_' + subFrag + ' Subs']
-                            c = list(IsotopologueFragments.isin([sub]) * subFragInfo['relCont'])
-
-                            if cFull == []:
-                                cFull = np.array(c)
-                            else:
-                                cFull = cFull + np.array(c)
+                            cFull = cFull + IsotopologueFragments.isin([sub]).to_numpy() * subFragInfo['relCont']
 
                         MeasurementVector.append(v)
                         CMatrix.append(cFull)
