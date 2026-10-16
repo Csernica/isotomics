@@ -8,6 +8,7 @@ from . import basicDeltaOperations as op
 
 import json
 import copy
+import warnings
 
 #Name of the optional row in the input csv giving the relative contribution of each fragment subgeometry
 RELATIVE_CONTRIBUTION_ROW = 'Relative Contribution'
@@ -151,7 +152,7 @@ def moleculeFromCsv(path, deltas = False, fragSubset = None):
 
 def extractExperimentalErrors(errorPath, UValueError = 0.001, MNError = 0.001):
     '''
-    Read in error bars from a user provided csv. If no CSV is provided, instead return a single float giving error for the molecular average measurement (U Value) and for the M+N Experiment. A value of 0.001 corresponds to a 1 per mil error. 
+    Read in error bars from a user provided csv. If no CSV is provided, instead return a single float giving error for the molecular average measurement (U Value) and for the M+N Experiment. All errors are relative errors given as fractions, both in the csv and as arguments: a value of 0.001 corresponds to a 1 per mil error. 
 
     Inputs:
         errorPath: Path to the CSV. 
@@ -190,7 +191,7 @@ def extractExperimentalErrors(errorPath, UValueError = 0.001, MNError = 0.001):
                         break  # Found another header, stop processing this section
                     else:
                         # This row is data to be included for the current header
-                        errorDict[keyName][nextHeaderCell] = float(nextRow[1]) / 1000
+                        errorDict[keyName][nextHeaderCell] = float(nextRow[1])
 
         #Input file has '13C/Unsub' for U Values. Later code expects '13C'. 
         UValueErrors = {subKey.split('/')[0]: subValue for subKey, subValue in errorDict.get('Molecular Average', {}).items()}
@@ -326,9 +327,9 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
         abundanceThreshold, UValueList, massThreshold, disableProgress, calcFF, omitMeasurements, ffstd: Inputs to simulateMeasurement. See that function for documentation. 
         plot: Construct a plot showing the comparison. 
         MonteCarloN, perturbTheoryOAmt: Used to run the Monte Carlo routine; see ss.M1MonteCarlo.
-        errorPath: The path to a CSV containing information about the experimental errors. 
-        MNError: IF no errorPath, then use this value for the error on every observed fragment. 
-        UValueError: IF no errorPath, use this value for the error on the molecular average measurement. 
+        errorPath: The path to a CSV containing information about the experimental errors, as relative errors given as fractions (0.001 = 1 per mil). 
+        MNError: IF no errorPath, then use this relative error, as a fraction (0.001 = 1 per mil), on every observed peak. 
+        UValueError: IF no errorPath, use this relative error, as a fraction (0.001 = 1 per mil), on the molecular average measurement. 
         resultsFileName: Name the output CSV. 
         outputPrecision: Adjust precision on the output CSV. 
         UMNSub: Choose which isotope to anchor to when calculating site-specific data. 
@@ -360,6 +361,8 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
                                                                             unresolvedDict = {})
 
     #Get error bars used for the simulation from an input CSV or use the same specified value for each.
+    if errorPath and (MNError or UValueError):
+        warnings.warn("errorPath was given, so the MNError and UValueError arguments are ignored; errors are read from the file.")
     UValueError, MNError = extractExperimentalErrors(errorPath, UValueError = UValueError, MNError = MNError)
 
     #'Read in' the 'experimental' data (from smpMeasurement, stdMeasurement)

@@ -40,7 +40,7 @@ def test_m1_solver_smoke(tmp_path, monkeypatch):
         standard_delta_approx,
         UValue="13C/Unsub",
         mAObs=-0.8,
-        mARelErr=0.1,
+        mARelErr=0.0001,
         perturbTheoryOAmt=0.0003,
         MonteCarloN=50,
         resultsFileName="M1Output.csv",

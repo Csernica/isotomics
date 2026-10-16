@@ -35,7 +35,7 @@ def main():
         # Molecular-average constraints (from external measurement or Orbitrap)
         STANDARD_DELTA_APPROX = [-11.9, -9.95, 0, 0, 0, 0]
         MOLECULAR_AVERAGE_SAMPLE_COMPOSITION = -0.8
-        MOLECULAR_AVG_SAMPLE_ERROR = 0.1
+        MOLECULAR_AVG_SAMPLE_ERROR = 0.0001  # relative error as a fraction (0.1 per mil)
         U_VALUE = "13C/Unsub"
 
         # Initialize molecule

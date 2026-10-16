@@ -36,7 +36,7 @@ def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = 
         cwd: The current working directory. 
         MOLECULE_INPUT_PATH: A path to the .csv file used to initialize data about your molecule. 
         std_deltas: Known or approximated delta values for the standard, used for forward model standardization. 
-        UValue, mAObs, mARelErr: Used to set the molecular average U Value of the sample used to convert M+1 relative abundancees to site-specific deltas. See getUVal for details. 
+        UValue, mAObs, mARelErr: Used to set the molecular average U Value of the sample used to convert M+1 relative abundancees to site-specific deltas. mARelErr is a relative error given as a fraction (0.0001 = 0.1 per mil). See getUVal for details. 
         perturbTheoryOAmt: Used for the 'observed abundance correction' to low abundance peaks. See the appendix to Csernica and Eiler 2023 for details about this correction. A typical value of 0.001 (1 per mil) is a good estimate. Test different values with simulated data to see if your choice is appropriate. 
         MonteCarloN: The number of iterations used for the M+1 monte carlo solver. 
         outputPrecision: The number of decimals to include in the output .csv. 
@@ -116,7 +116,7 @@ def getUVal(rtnMeans, initializedMolecule, UValue = '13C/Unsub', mAObs = None, m
     Inputs:
         rtnMeans: A dataframe, returned via dataAnalyzerMNIsoX.processIndividualAndAverageIsotopeRatios, which gives the mean values of samples and standards. 
         initializedMolecule: A read in molecular csv containing basic details about the molecule. 
-        UValue, mAObs, mARelErr: Information about the SAMPLE's ratio used to convert from M+1 relative abundances to site-specific deltas. mAObs is the delta value. mARelErr is the error. For example, if I have an EA measurement OF MY SAMPLE of 13C/Unsub that gives -30.0 +/- 0.1 per mil vs VPDB, then I set: UValue = '13C/Unsub', mAObs = -30.0, mARelErr = 0.1. If I do not have this information for the sample, I can use Orbitrap data. In this case, I must include appropriate Orbitrap files in 'full_molecular_average', specify the substitution I want to use, and include 'None' for mAObs and mARelErr. 
+        UValue, mAObs, mARelErr: Information about the SAMPLE's ratio used to convert from M+1 relative abundances to site-specific deltas. mAObs is the delta value. mARelErr is its relative error, given as a fraction. For example, if I have an EA measurement OF MY SAMPLE of 13C/Unsub that gives -30.0 +/- 0.1 per mil vs VPDB, then I set: UValue = '13C/Unsub', mAObs = -30.0, mARelErr = 0.0001. If I do not have this information for the sample, I can use Orbitrap data. In this case, I must include appropriate Orbitrap files in 'full_molecular_average', specify the substitution I want to use, and include 'None' for mAObs and mARelErr. 
 
     Outputs: 
         UValuesSmp: A dictionary. The first key is the rare substitution used (e.g., '13C'.) Values are a dictionary. In that dictionary, you have 'Observed' and 'Error'. 'Observed' gives the U Value as a ratio (e.g., 0.01118 for 13C/Unsub for a molecule with 1 carbon, or 2*0.01118 if there are two carbons, etc.) and 'Error' gives the error on that ratio (e.g., 0.00001118 if there is 1 per mil error). 
@@ -135,7 +135,7 @@ def getUVal(rtnMeans, initializedMolecule, UValue = '13C/Unsub', mAObs = None, m
             print("No error given for molecular average measurement, defaulting to 0")
             return {rare_sub:{'Observed': UOrbi, 'Error': UOrbi * 0}}
         else:
-            return {rare_sub:{'Observed': UOrbi, 'Error': UOrbi * mARelErr / 1000}}
+            return {rare_sub:{'Observed': UOrbi, 'Error': UOrbi * mARelErr}}
 
     #Get actual standard enrichment vs reference frame
     stdRatioVSRef = getAverageRatio(mDf, U_ValID)
