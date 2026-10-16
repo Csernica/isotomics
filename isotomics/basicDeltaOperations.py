@@ -1,3 +1,5 @@
+import re
+import warnings
 import numpy as np
 import pandas as pd
 from types import MappingProxyType
@@ -25,7 +27,7 @@ ISOTOPE_DATA = MappingProxyType({
     }),
     "H": MappingProxyType({
         0: MappingProxyType({"label": "", "mass": 1.007825032}),
-        1: MappingProxyType({"label": "D", "mass": 2.014101778}),
+        1: MappingProxyType({"label": "2H", "mass": 2.014101778}),
     }),
     "O": MappingProxyType({
         0: MappingProxyType({"label": "", "mass": 15.99491462}),
@@ -39,6 +41,64 @@ ISOTOPE_DATA = MappingProxyType({
         4: MappingProxyType({"label": "36S", "mass": 35.9670807}),
     }),
 })
+
+# Older data and inputs label deuterium 'D'; isotomics uses '2H'. Matches 'D' as a whole substitution
+# name, including inside compound names like 'D-13C' or 'D/Unsub'.
+_LEGACY_DEUTERIUM = re.compile(r"(?<![A-Za-z0-9])D(?![A-Za-z0-9])")
+_warnedLegacySources = set()
+
+def standardizeSubstitutionName(name):
+    """
+    Returns a substitution name with deuterium written as '2H' (e.g. 'D' -> '2H', 'D-13C' -> '2H-13C',
+    'D/Unsub' -> '2H/Unsub'). Other names, and non-string values, are returned unchanged.
+    """
+    if not isinstance(name, str):
+        return name
+    return _LEGACY_DEUTERIUM.sub("2H", name)
+
+def standardizeSubstitutionNames(values, source):
+    """
+    Applies standardizeSubstitutionName to a list or pandas Series of names read from data, warning if any
+    'D' labels were renamed to '2H'. source describes where the names came from, for the warning.
+    """
+    renamed = [standardizeSubstitutionName(v) for v in values]
+    if any(isinstance(old, str) and old != new for old, new in zip(values, renamed)):
+        _warnRenamed(source)
+    if isinstance(values, pd.Series):
+        return pd.Series(renamed, index=values.index, name=values.name, dtype=values.dtype)
+    return renamed
+
+def standardizeSubstitutionArgument(value, source):
+    """
+    Applies standardizeSubstitutionName throughout a user-supplied argument: a string, or a list, tuple, set or
+    (nested) dictionary of them, including dictionary keys. For example {'M1': {'44': ['D']}} becomes
+    {'M1': {'44': ['2H']}}. Warns (once per source) if any 'D' labels were renamed. Returns a new object; the
+    input is not modified.
+    """
+    renamedAny = False
+
+    def walk(v):
+        nonlocal renamedAny
+        if isinstance(v, str):
+            new = standardizeSubstitutionName(v)
+            renamedAny = renamedAny or new != v
+            return new
+        if isinstance(v, dict):
+            return {walk(k): walk(x) for k, x in v.items()}
+        if isinstance(v, (list, tuple, set)):
+            return type(v)(walk(x) for x in v)
+        return v
+
+    result = walk(value)
+    if renamedAny:
+        _warnRenamed(source)
+    return result
+
+def _warnRenamed(source):
+    #Warn once per source per session, not once per file or call
+    if source not in _warnedLegacySources:
+        _warnedLegacySources.add(source)
+        warnings.warn(f"Renamed deuterium label 'D' to '2H' in {source}; isotomics uses '2H'.", stacklevel=4)
 
 def _normalize_mass_code(mass_code):
     """Normalize isotope mass code to int (supports int/str inputs)."""
@@ -58,7 +118,7 @@ def deltaToConcentration(atomIdentity,delta):
     
     ([12C], [13C], 0, 0). 
 
-    Currently, this function accepts carbon, hydrogen, nitrogen, oxygen, and sulfur. The atomIdentity can be given as the element symbol (for example, ``"C"``, ``"H"``, ``"N"``, ``"O"``, ``"S"``) or as the M+1 isotope ``"13C"``, ``"D"``, ``"15N"``, ``"17O"``, ``"33S"``).
+    Currently, this function accepts carbon, hydrogen, nitrogen, oxygen, and sulfur. The atomIdentity can be given as the element symbol (for example, ``"C"``, ``"H"``, ``"N"``, ``"O"``, ``"S"``) or as the M+1 isotope ``"13C"``, ``"2H"``, ``"15N"``, ``"17O"``, ``"33S"``).
 
     For isotope systems with multiple rare isotopes ('O', or 'S'), the delta value is assumed to be for the M+1 isotope (17O or 33S). The M+2 isotope is then derived via mass-scaling. For oxygen, the mass exponent is 0.52; for sulfur it is 0.515 (for 34S from 33S) and 1 / 1.9 (for 36S from 34S). 
 
@@ -66,7 +126,7 @@ def deltaToConcentration(atomIdentity,delta):
 
     Args:
         atomIdentity: Isotope key identifying the ratio system (for example,
-            ``"13C"``, ``"15N"``, ``"D"``, ``"17O"``, ``"33S"``).
+            ``"13C"``, ``"15N"``, ``"2H"``, ``"17O"``, ``"33S"``).
         delta: Delta value in per mil for the specified isotope system.
 
     Returns:
@@ -211,7 +271,7 @@ def concentrationToM1Ratio(concentrationTuple):
 
 def ratioToDelta(atomIdentity, ratio):
     """
-    Converts an isotope ratio into a delta value. The atomIdentity input can be the element symbol (for example, ``"C"``, ``"H"``, ``"N"``, ``"O"``, ``"S"``), which is interpreted as the corresponding M+1 isotope (``"13C"``, ``"D"``, ``"15N"``, ``"17O"``, ``"33S"``). Or, it can be explciitly given as the M+1 isotope or (for oxygen and sulfur) other M+N isotopes (``"18O"``, ``"34S"``, ``"36S"``).
+    Converts an isotope ratio into a delta value. The atomIdentity input can be the element symbol (for example, ``"C"``, ``"H"``, ``"N"``, ``"O"``, ``"S"``), which is interpreted as the corresponding M+1 isotope (``"13C"``, ``"2H"``, ``"15N"``, ``"17O"``, ``"33S"``). Or, it can be explciitly given as the M+1 isotope or (for oxygen and sulfur) other M+N isotopes (``"18O"``, ``"34S"``, ``"36S"``).
 
     Args:
         atomIdentity: Isotope key of interest.

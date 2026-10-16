@@ -6,7 +6,7 @@ import os
 
 MASS_CHANGE = {'13C': 13.00335484 - 12,
             '15N': 15.00010889 - 14.003074,
-            'D': 2.014101778 - 1.007825032,
+            '2H': 2.014101778 - 1.007825032,
             '17O': 16.99913175 - 15.99491462,
             '18O': 17.9991596 - 15.99491462,
             '33S': 32.9714589 - 31.97207117,
@@ -15,10 +15,10 @@ MASS_CHANGE = {'13C': 13.00335484 - 12,
 
 def massChangeVsUnsub(subKey):
     '''
-    Given a subKey (e.g., 'D-D-13C'), returns the mass change caused by those isotope substitutions.
+    Given a subKey (e.g., '2H-2H-13C'), returns the mass change caused by those isotope substitutions.
 
     Inputs:
-        subKey: A string, like 'D-D-13C'.
+        subKey: A string, like '2H-2H-13C'.
 
     Outputs:
         mc: A float, the mass change associated with those rare isotope substitutions. 
@@ -38,7 +38,7 @@ def fullSpectrumVis(fullMolecule, molecularDataFrame, figsize = (8,4), massError
     (Note: The 'fullMolecule' input is typically from simulateMeasurement, which gives U values (e.g., 13C/Unsub) rather than abundances (e.g., 13C abundance). Because we renormalize to relative abundances and the Unsub in each denominator cancels, the spectrum is still correct). 
 
     Inputs:
-        fullMolecule: A dictionary, where keys are substitutions (e.g., '' for Unsub, '13C', '13C-D'), and values are abundances. 
+        fullMolecule: A dictionary, where keys are substitutions (e.g., '' for Unsub, '13C', '13C-2H'), and values are abundances. 
         molecularDataFrame: A dataframe containing basic information about the molecule. 
         figsize: Desired size of the output figure. 
         massError: Apply any mass error to the computed masses. 

@@ -167,6 +167,7 @@ def extractExperimentalErrors(errorPath, UValueError = 0.001, MNError = 0.001):
     '''
     if errorPath:
         errorDf = pd.read_csv(errorPath, header = None)
+        errorDf[0] = op.standardizeSubstitutionNames(errorDf[0], 'the error file')
 
         targetHeaders = ['Molecular Average']
         fragmentPrefix = 'Fragment'
@@ -191,7 +192,7 @@ def extractExperimentalErrors(errorPath, UValueError = 0.001, MNError = 0.001):
                         break  # Found another header, stop processing this section
                     else:
                         # This row is data to be included for the current header
-                        errorDict[keyName][nextHeaderCell] = float(nextRow[1])
+                        errorDict[keyName][op.standardizeSubstitutionName(nextHeaderCell)] = float(nextRow[1])
 
         #Input file has '13C/Unsub' for U Values. Later code expects '13C'. 
         UValueErrors = {subKey.split('/')[0]: subValue for subKey, subValue in errorDict.get('Molecular Average', {}).items()}
@@ -246,7 +247,7 @@ def simulateMeasurement(initializedMolecule, abundanceThreshold = 0, UValueList 
         disableProgress: Disables tqdm progress bars when True.
         calcFF: When True, computes a new set of fractionation factors for this measurement.
         fractionationFactors: A dictionary, specifying a fractionation factor to apply to each ion beam. This is used to apply fractionation factors calculated previously to this predicted measurement (e.g. for a sample/standard comparison with the same experimental fractionation)
-        omitMeasurements: omitMeasurements: A dictionary, {}, specifying measurements which I will not observed. For example, omitMeasurements = {'M1':{'61':'D'}} would mean I do not observe the D ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance. 
+        omitMeasurements: omitMeasurements: A dictionary, {}, specifying measurements which I will not observed. For example, omitMeasurements = {'M1':{'61':'2H'}} would mean I do not observe the 2H ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance. 
         ffstd: A float; if new fractionation factors are calculated, they are pulled from a normal distribution centered around 1, with this standard deviation.
         unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other.
         outputFull: A boolean. Typically False, in which case beams that are not observed are culled from the dictionary. If True, includes this information; this should only be used for debugging, and will likely break the solver routine. 
@@ -256,6 +257,11 @@ def simulateMeasurement(initializedMolecule, abundanceThreshold = 0, UValueList 
         MN: A dictionary where keys are mass selections ("M1", "M2") and values are dictionaries giving information about the isotopologues of each mass selection.
         fractionationFactors: The calculated fractionation factors for this measurement (empty unless calcFF == True)
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    UValueList = op.standardizeSubstitutionArgument(UValueList, "the UValueList argument")
+    fractionationFactors = op.standardizeSubstitutionArgument(fractionationFactors, "the fractionationFactors argument")
+    omitMeasurements = op.standardizeSubstitutionArgument(omitMeasurements, "the omitMeasurements argument")
+    unresolvedDict = op.standardizeSubstitutionArgument(unresolvedDict, "the unresolvedDict argument")
     #Unpack initialized molecule dictionary
     molecularDataFrame = initializedMolecule['molecularDataFrame']
     fragmentationDictionary = initializedMolecule['fragmentationDictionary']
@@ -337,6 +343,12 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
     Outputs:
         simulationOutput: A dataframe containing the results of the simulation. Also produces a cleaned CSV containing the most relevant pieces of information. Also plots these data (if plot). 
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    UValueList = op.standardizeSubstitutionArgument(UValueList, "the UValueList argument")
+    omitMeasurements = op.standardizeSubstitutionArgument(omitMeasurements, "the omitMeasurements argument")
+    MNError = op.standardizeSubstitutionArgument(MNError, "the MNError argument")
+    UValueError = op.standardizeSubstitutionArgument(UValueError, "the UValueError argument")
+    UMNSub = op.standardizeSubstitutionArgument(UMNSub, "the UMNSub argument")
     simArgs = {
     'abundanceThreshold': abundanceThreshold,
     'UValueList': UValueList,

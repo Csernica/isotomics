@@ -1,4 +1,5 @@
 import json
+from . import basicDeltaOperations as op
 
 def readJSON(filepath):
     '''
@@ -26,6 +27,8 @@ def readComputedData(JSONInput, error = 0, theory = {}):
     Outputs:
         process: A dictionary giving the processed .json file. Each fragment of each mass selection has a dictionary, specifying the substitutions, their observed abundances and errors, and for standards only, their predicted abundances. 
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    error = op.standardizeSubstitutionArgument(error, "the error argument")
     process = {}
     for massSelection, massSelectionData in JSONInput.items():
         #skip non MN measurements
@@ -72,6 +75,9 @@ def readComputedUValues(JSONInput, error = 0, UMNSub = '13C'):
         U Values: A dictionary specifying the molecular average U values and their errors. 
         
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    error = op.standardizeSubstitutionArgument(error, "the error argument")
+    UMNSub = op.standardizeSubstitutionArgument(UMNSub, "the UMNSub argument")
     UValues = {}
     if isinstance(error, float):
         # If input_value is a float, multiply every value in k by input_value

@@ -48,6 +48,14 @@ def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = 
         cleanExperimentalOutput: A dataframe containing basic information about the molecule and the results of the M+1 algorithm. 
         Also returns a plot (if plot) and an output .csv (of cleanExperimentalOutput)
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    UValue = op.standardizeSubstitutionArgument(UValue, "the UValue argument")
+    #Older processed data may label deuterium 'D'; isotomics uses '2H'
+    rtnMeans = rtnMeans.copy()
+    for col in ('MN Relative Abundance', 'IsotopeRatio'):
+        if col in rtnMeans.columns:
+            rtnMeans[col] = op.standardizeSubstitutionNames(rtnMeans[col], 'the experimental data')
+
     #GET FORWARD MODEL STANDARD
     initializedMolecule = sim.moleculeFromCsv(os.path.join(cwd, MOLECULE_INPUT_PATH), deltas = std_deltas)
     processFragKeys = defineProcessFragKeys(initializedMolecule['fragmentationDictionary'])
@@ -121,6 +129,8 @@ def getUVal(rtnMeans, initializedMolecule, UValue = '13C/Unsub', mAObs = None, m
     Outputs: 
         UValuesSmp: A dictionary. The first key is the rare substitution used (e.g., '13C'.) Values are a dictionary. In that dictionary, you have 'Observed' and 'Error'. 'Observed' gives the U Value as a ratio (e.g., 0.01118 for 13C/Unsub for a molecule with 1 carbon, or 2*0.01118 if there are two carbons, etc.) and 'Error' gives the error on that ratio (e.g., 0.00001118 if there is 1 per mil error). 
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    UValue = op.standardizeSubstitutionArgument(UValue, "the UValue argument")
     #Various representations of U_VAL; rare_sub gives '13C', U_ValID gives 'C'
     rare_sub = UValue.split('/')[0]
     U_ValID = re.sub(r'\d+', '', rare_sub)

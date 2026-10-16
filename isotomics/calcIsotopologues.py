@@ -399,7 +399,7 @@ def uEl(el, n):
             return '13C'
     if el == 'H':
         if n == 1:
-            return 'D'
+            return '2H'
     if el == 'O':
         if n == 1:
             return '17O'

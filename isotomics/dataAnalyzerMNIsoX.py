@@ -13,6 +13,7 @@ import re
 import numpy as np
 from . import readCSVAndSimulate as sim
 from . import dataScreenIsoX
+from . import basicDeltaOperations as op
 
 def readIsoX(filePath):
     '''
@@ -25,6 +26,7 @@ def readIsoX(filePath):
         IsoXDf: A dataframe with the data from the .csv output. 
     '''
     IsoXDf = pd.read_csv(filePath, sep = '\t')
+    IsoXDf['isotopolog'] = op.standardizeSubstitutionNames(IsoXDf['isotopolog'], '.isox data')
 
     IsoXDf.drop(columns=['ions.incremental','peakResolution','basePeakIntensity','rawOvFtT','intensCompFactor','agc','analyzerTemperature','numberLockmassesFound'], inplace = True)
     IsoXDf.rename(columns={'scan.no':'scanNumber','time.min':'retTime','it.ms':'integTime','mzMeasured':'mass'},inplace = True)
@@ -68,7 +70,7 @@ def calc_Append_Ratios(mergedDf, subNameList, mostAbundant = True):
 
     Inputs:
         mergedDf: A dataframe with all information for a single file. 
-        subNameList: A list of substitution names, e.g. ['13C','18O','D']
+        subNameList: A list of substitution names, e.g. ['13C','18O','2H']
 
     Outputs: 
         mergedDf: The same dataframe with ratios added. 
@@ -104,7 +106,7 @@ def cull_By_Time(mergedDf, timeBounds, scanNumber = False):
     
 def combine_Substituted_Peaks(splitDf, cullOn = None, cullAmt = 3, scanNumber = False, timeBounds = (0,0),MNRelativeAbundance = False):
     '''
-    splitDf: A Pandas groupBy object; can be iterated through; iterations give tuples of isotopolog strings ('D','M0', etc.) and dataframes corresponding to the data for that substitution. 
+    splitDf: A Pandas groupBy object; can be iterated through; iterations give tuples of isotopolog strings ('2H','M0', etc.) and dataframes corresponding to the data for that substitution. 
     cullByTime: If True, only include data within certain set of timepoints (by scan # or retTime)
     scanNumber: If True & cullByTime is True, then cull based on scan #. OTherwise, cull by retTime.
     timeBounds: A tuple; the retTime or scanNumber limits to use. 

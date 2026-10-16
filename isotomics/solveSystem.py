@@ -576,6 +576,9 @@ def M1MonteCarlo(standardData, sampleData, OCorrection, isotopologuesDict, fragm
             'O Correct': [],
             'StoreExpFactors': []}}
     """
+    #Accept the legacy deuterium label 'D' in these arguments
+    includeSubs = op.standardizeSubstitutionArgument(includeSubs, "the includeSubs argument")
+    omitSubs = op.standardizeSubstitutionArgument(omitSubs, "the omitSubs argument")
     MNKey = "M1"
     Isotopologues = isotopologuesDict[MNKey]
 
@@ -730,6 +733,8 @@ def processM1MCResults(M1Results, UValuesSmp, isotopologuesDict,  molecularDataF
         >>> processedResults
         {'CRF Deltas': [[-10.613715956522718, -3.21622108281161, -2.055183007075523]], 'Relative Deltas': [[-0.6199151075985121, -3.21622108281161, -2.055183007075523]], 'M1 M+N Relative Abundance': [[0.7286264337642733, 0.012472039963464437, 0.25890152627226215]], 'UM1': [[0.030362166792276064, 0.030362166792276064, 0.030362166792276064]], 'Calc U Values': [[0.022122677311212154, 0.0003786781576106399, 0.007860811323453266]]}
     """
+    #Accept the legacy deuterium label 'D' in these arguments
+    UMNSub = op.standardizeSubstitutionArgument(UMNSub, "the UMNSub argument")
     MNKey = "M1"
     processedResults = {'CRF Deltas':[],'Relative Deltas':[],MNKey + ' M+N Relative Abundance':[],'UM1':[],'Calc U Values':[]}
     string = "NUMPY"

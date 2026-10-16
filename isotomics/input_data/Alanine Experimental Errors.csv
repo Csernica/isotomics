@@ -1,12 +1,12 @@
 ﻿Molecular Average,Relative Error
 13C/Unsub,0.0001
 Fragment full,M+1 Relative Abundance Error
-D,0.005
+2H,0.005
 15N,0.002
 13C,0.001
 17O,0.005
 Fragment 44,M+1 Relative Abundance Error
 Unsub,0.001
-D,0.005
+2H,0.005
 13C,0.001
 15N,0.002

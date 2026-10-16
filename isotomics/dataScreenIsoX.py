@@ -3,9 +3,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from . import dataAnalyzerMNIsoX as dA
+from . import basicDeltaOperations as op
 from tqdm import tqdm
     
-SUB_MASS_DICT = {'d':1.00627674587,'15n':0.997034886,'13c':1.003354835,
+SUB_MASS_DICT = {'2h':1.00627674587,'15n':0.997034886,'13c':1.003354835,
                    'unsub':0,'33s':0.999387735,'34s':1.995795825,'36s':3.995009525,
                   '18o':2.0042449924,'17o':1.0042171364}
 
@@ -63,7 +64,7 @@ def zeroCountsScreen(mergedDict, threshold = 0):
 
 def getThisSubMass(subKey):
     '''
-    Given a subKey, like '13C', (or 'D-13C', split by '-', for multiple substitutions), get the mass change relative to no substitutions. 
+    Given a subKey, like '13C', (or '2H-13C', split by '-', for multiple substitutions), get the mass change relative to no substitutions. 
     '''
     computedMass = 0
     thisSubs = subKey.split('-')
@@ -179,6 +180,8 @@ def visualizeTICVersusTime(fileName, mergedDict, targetRatio='13C/Unsub', scan_a
     - a MN relative abundance like 'MN Relative Abundance 13C'
     - a bare substitution like '13C' (will be interpreted as MN Relative Abundance)
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    targetRatio = op.standardizeSubstitutionArgument(targetRatio, "the targetRatio argument")
     fig, axes = plt.subplots(nrows = 1, ncols = 2, figsize = (9*0.8,3*0.8), dpi = 300, gridspec_kw={'width_ratios': [2, 1]})
     thisDf = mergedDict[fileName]['mergedDf']
 

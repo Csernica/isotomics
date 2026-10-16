@@ -45,6 +45,8 @@ def calculateUValues(bySub, massThreshold = 3, subList = None):
         ...
         
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    subList = op.standardizeSubstitutionArgument(subList, "the subList argument")
     if subList is None:
         subList = []
 
@@ -276,7 +278,7 @@ def predictMNFragmentExpt(MNDict, molecularDataFrame, fragmentationDictionary, a
                                  If you have input data from a labeling experiment which enumerates how much each site contributes to an observed fragment, then currently you have to use this information to hypothesize (or guess) specific fragment subgeometries which are present and input the information that way.                                 
 
         abundanceThreshold: Does not include measurements below a certain relative abundance, i.e. assuming they will not be  measured due to low abundance. 
-        omitMeasurements: A dictionary, {}, specifying measurements which I will not observed. For example, omitMeasurements = {'M1':{'61':'D'}} would mean I do not observe the D ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance. 
+        omitMeasurements: A dictionary, {}, specifying measurements which I will not observed. For example, omitMeasurements = {'M1':{'61':'2H'}} would mean I do not observe the 2H ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance. 
         fractionationFactors: A dictionary, specifying a fractionation factor to apply to each ion beam. This is used to apply fractionation factors calculated previously to this predicted measurement (e.g. for a sample/standard comparison with the same experimental fractionation). The workflow is: run once with fractionationFactors = None,  calcFF = True and your chosen ffstd. Then get the results from the calculatedFF output to this function. In the future, set fractionationFactors = calculatedFF, and set calcFF = False. Then you will have the same fractionation factors for both simulations. 
         calcFF: A boolean, specifying whether new fractionation factors should be calculated via this function. If True, fractionFactors should be left empty. 
         ffstd: A float. If new fractionation factors are calculated, they are generated from a normal distribution with mean 1 and standard deviation of ffstd. 
@@ -306,6 +308,10 @@ def predictMNFragmentExpt(MNDict, molecularDataFrame, fragmentationDictionary, a
         >>> predictedMeasurement['M1']['frag']
         {'33S': {'Abs. Abundance': 0.0073061703996178, 'Rel. Abundance': 0.2591689615803483, 'Combined Rel. Abundance': 0.2591689615803483, 'Adj. Rel. Abundance': 0.25916896158034836}, 'Unsub': {'Abs. Abundance': 0.0003523694471010285, 'Rel. Abundance': 0.012499465342690658, 'Combined Rel. Abundance': 0.012499465342690658, 'Adj. Rel. Abundance': 0.01249946534269066}, '13C': {'Abs. Abundance': 0.020532221713101362, 'Rel. Abundance': 0.728331573076961, 'Combined Rel. Abundance': 0.728331573076961, 'Adj. Rel. Abundance': 0.7283315730769611}}
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    omitMeasurements = op.standardizeSubstitutionArgument(omitMeasurements, "the omitMeasurements argument")
+    fractionationFactors = op.standardizeSubstitutionArgument(fractionationFactors, "the fractionationFactors argument")
+    unresolvedDict = op.standardizeSubstitutionArgument(unresolvedDict, "the unresolvedDict argument")
     if omitMeasurements is None:
         omitMeasurements = {}
     if fractionationFactors is None:
@@ -411,7 +417,7 @@ def computeMNRelAbundances(allMeasurementInfo, omitMeasurements = None, abundanc
     
     Args:
         allMeasurementInfo: A dictionary containing information about the absolute abundance of peaks observed in the measurement. 
-        omitMeasurements: Allows a user to manually specify ion beams to not measure. For example, omitMeasurements = {'M1':{'61':'D'}} would mean I do not observe the D ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance. 
+        omitMeasurements: Allows a user to manually specify ion beams to not measure. For example, omitMeasurements = {'M1':{'61':'2H'}} would mean I do not observe the 2H ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance. 
         abundanceThreshold: gives a relative abundance threshold (e.g. 0.01) below which peaks will not be observed. If a simulated ion beam has relative abundance below this threshold, it is culled from the predicted measurement. 
         unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other. 
         outputFull: False by default. Can be set True to include information about all ion beams, not only the observed ones. This is useful for debugging. outputFull: False by default. Can be set True to include information about all ion beams, not only the observed ones. This is useful for debugging. 
@@ -422,6 +428,9 @@ def computeMNRelAbundances(allMeasurementInfo, omitMeasurements = None, abundanc
     Example:
         >>> # add example
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    omitMeasurements = op.standardizeSubstitutionArgument(omitMeasurements, "the omitMeasurements argument")
+    unresolvedDict = op.standardizeSubstitutionArgument(unresolvedDict, "the unresolvedDict argument")
     
     if omitMeasurements is None:
         omitMeasurements = {}
@@ -525,6 +534,8 @@ def trackMNFragments(MN, molecularDataFrame, fragmentationDictionary, unresolved
         'frag_01 Subs': 'Unsub'},
         ...
     '''
+    #Accept the legacy deuterium label 'D' in these arguments
+    unresolvedDict = op.standardizeSubstitutionArgument(unresolvedDict, "the unresolvedDict argument")
     if unresolvedDict is None:
         unresolvedDict = {}
 
@@ -652,7 +663,7 @@ def predictTraditionalMeasurement(molecularDataFrame, atomFrag, byAtom):
         byAtom: A dictionary with all isotopologues to fragment. 
 
     Returns:
-        predictSpectrum: A dictionary. Keys are subKeys (e.g., 'D-D-13C') and values are the abundances of those after fragmentation. 
+        predictSpectrum: A dictionary. Keys are subKeys (e.g., '2H-2H-13C') and values are the abundances of those after fragmentation. 
 
     Example:
         >>> import pandas as pd
