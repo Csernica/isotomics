@@ -271,7 +271,7 @@ def plotOutput(simulationOutput, relativeDeltasActual = None, ylim = False):
         relativeDeltasActual: A list, giving the actual delta values for the sample standard comparison. The ordering of the list should be the same as the indices of simulationOutput. If "None", do not plot these. 
 
     Outputs:
-        None. Constructs a plot. 
+        fig: The matplotlib figure. 
     '''
     fig, ax = plt.subplots(figsize = (8,4))
 
@@ -287,6 +287,8 @@ def plotOutput(simulationOutput, relativeDeltasActual = None, ylim = False):
     ax.set_ylabel(r"$\delta_{STD}$")
     if ylim:
         ax.set_ylim(*ylim)
+
+    return fig
 
 def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold = 0, UValueList = [], massThreshold = 1,  disableProgress = True, calcFF = False, omitMeasurements = {}, ffstd = 0.05, plot = True, MonteCarloN = 100, perturbTheoryOAmt = 0, errorPath = False, MNError = 0, UValueError = 0, resultsFileName = 'output.csv', outputPrecision = 3, UMNSub = '13C'):
     '''
@@ -359,7 +361,7 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
     #Round off decimals
     toRound = ['CRF Deltas', 'CRF Deltas Error', 'Relative Deltas','Relative Deltas Error']
     cleanSimulationOutput[toRound] = cleanSimulationOutput[toRound].round(decimals=outputPrecision) 
-    cleanSimulationOutput.to_csv(resultsFileName, index=False)
+    cleanSimulationOutput.to_csv(resultsFileName, index_label='Site Names')
 
     #Construct Plot
     if plot:

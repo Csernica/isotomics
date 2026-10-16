@@ -1,6 +1,7 @@
 from importlib import resources
 
 import numpy as np
+import pandas as pd
 
 from isotomics import dataAnalyzerMNIsoX as data_analyzer
 from isotomics import organizeData
@@ -56,4 +57,6 @@ def test_m1_solver_smoke(tmp_path, monkeypatch):
     assert np.isfinite(output_df["CRF Deltas"]).all()
     assert np.isfinite(output_df["CRF Deltas Error"]).all()
     assert (tmp_path / "M1Output.csv").exists()
+    written = pd.read_csv(tmp_path / "M1Output.csv")
+    assert written["Site Names"].tolist() == output_df.index.tolist()
     assert (tmp_path / "all_data_output.csv").exists()

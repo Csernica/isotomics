@@ -71,6 +71,7 @@ def main():
             mAObs=MOLECULAR_AVERAGE_SAMPLE_COMPOSITION,
             mARelErr=MOLECULAR_AVG_SAMPLE_ERROR,
             perturbTheoryOAmt=0.0003,
+            plotPath="M1Output.png",
         )
 
 

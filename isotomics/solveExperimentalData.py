@@ -27,7 +27,7 @@ def defineProcessFragKeys(fragmentationDictionary):
 
     return processFragKeys
 
-def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = '13C/Unsub', mAObs = None, mARelErr = None, perturbTheoryOAmt = 0.001, MonteCarloN = 1000, outputPrecision = 3, resultsFileName = 'M1Output.csv', plot = True):
+def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = '13C/Unsub', mAObs = None, mARelErr = None, perturbTheoryOAmt = 0.001, MonteCarloN = 1000, outputPrecision = 3, resultsFileName = 'M1Output.csv', plot = True, plotPath = None):
     '''
     Parent function to process experimental M+1 Data and return results. 
 
@@ -41,7 +41,8 @@ def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = 
         MonteCarloN: The number of iterations used for the M+1 monte carlo solver. 
         outputPrecision: The number of decimals to include in the output .csv. 
         resultsFileName: Filename to export results to. 
-        plot: If True, return a plot. 
+        plot: If True, return a plot.
+        plotPath: If given (and plot is True), also save the plot to this path, e.g. 'M1Output.png'.
 
     Outputs: 
         cleanExperimentalOutput: A dataframe containing basic information about the molecule and the results of the M+1 algorithm. 
@@ -97,11 +98,14 @@ def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = 
     if existing:
         cleanExperimentalOutput[existing] = cleanExperimentalOutput[existing].round(decimals=outputPrecision)
     print(f"Writing experimental results to CSV: {resultsFileName}")
-    cleanExperimentalOutput.to_csv(resultsFileName, index=False)
+    cleanExperimentalOutput.to_csv(resultsFileName, index_label='Site Names')
     print("CSV write complete.")
 
     if plot:
-        sim.plotOutput(mDf)
+        fig = sim.plotOutput(mDf)
+        if plotPath is not None:
+            fig.savefig(plotPath, dpi=150, bbox_inches='tight')
+            print(f"Saved plot: {plotPath}")
 
     return cleanExperimentalOutput
 
