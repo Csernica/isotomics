@@ -31,14 +31,27 @@ def massChangeVsUnsub(subKey):
 
     return mc
 
-def fullSpectrumVis(fullMolecule, molecularDataFrame, figsize = (8,4), massError = 0, lowAbundanceCutOff = 0, xlim = (), ylim = (), outputIsotopologs = False, tolerance = 0.1):
+def drawPeaks(ax, massPlot, relAbundPlot, logY = False):
+    '''
+    Draws each peak as a vertical line at its mass, up to its relative abundance. With logY, the y axis is
+    logarithmic and the lines start a decade below the smallest peak (a log axis cannot include 0).
+    '''
+    if logY and relAbundPlot:
+        bottom = min(relAbundPlot) / 10
+        ax.vlines(massPlot, bottom, relAbundPlot)
+        ax.set_yscale('log')
+        ax.set_ylim(bottom=bottom)
+    else:
+        ax.vlines(massPlot, 0, relAbundPlot)
+
+def fullSpectrumVis(fullMolecule, molecularDataFrame, figsize = (8,4), massError = 0, lowAbundanceCutOff = 0, xlim = (), ylim = (), outputIsotopologs = False, tolerance = 0.1, logY = False):
     '''
     Takes in some predicted spectral data for the full molecule and outputs a plot of that spectrum. Plots these as relative abundances. 
 
-    (Note: The 'fullMolecule' input is typically from simulateMeasurement, which gives U values (e.g., 13C/Unsub) rather than abundances (e.g., 13C abundance). Because we renormalize to relative abundances and the Unsub in each denominator cancels, the spectrum is still correct). 
+    (Note: The 'fullMolecule' input is typically predictedMeasurement['U Values'] from simulateMeasurement, which gives U values (e.g., 13C/Unsub) rather than abundances (e.g., 13C abundance). The unsubstituted molecule has a U value of 1 by definition and is added if absent. Because we renormalize to relative abundances and the Unsub in each denominator cancels, the spectrum is still correct).
 
     Inputs:
-        fullMolecule: A dictionary, where keys are substitutions (e.g., '' for Unsub, '13C', '13C-2H'), and values are abundances. 
+        fullMolecule: A dictionary, where keys are substitutions (e.g., '13C', '13C-2H'; 'Unsub' or '' for the unsubstituted molecule, optional) and values are U values or abundances.
         molecularDataFrame: A dataframe containing basic information about the molecule. 
         figsize: Desired size of the output figure. 
         massError: Apply any mass error to the computed masses. 
@@ -47,6 +60,7 @@ def fullSpectrumVis(fullMolecule, molecularDataFrame, figsize = (8,4), massError
         ylim: Override the ylimits of the plot. 
         outputIsotopologs: If true, outputs a isotoplogs.tsv file with the peaks in the spectrum. 
         tolerance: The tolerance setting to use for an output isotopologs.tsv. 
+        logY: If True, use a logarithmic y axis, which shows small peaks alongside large ones. 
 
     Outputs:
         None. Displays a plot.
@@ -58,31 +72,37 @@ def fullSpectrumVis(fullMolecule, molecularDataFrame, figsize = (8,4), massError
     strSiteElements = ci.strSiteElements(molecularDataFrame)
     unsubMass = fas.computeMass(unsubStr, strSiteElements)
 
-    #Go through the spectral data and pull out abundances. 
-    for subKey, subData in fullMolecule.items():
-        mass = unsubMass + massChangeVsUnsub(subKey) if subKey else unsubMass
+    #U values are relative to the unsubstituted molecule, whose U value is therefore 1. It may be absent
+    #from the input (e.g. predictedMeasurement['U Values'] only lists rare substitutions), so add it.
+    unsubValue = fullMolecule.get('Unsub', fullMolecule.get('', 1))
+    peaks = {'Unsub': unsubValue}
+    peaks.update({subKey: subData for subKey, subData in fullMolecule.items() if subKey not in ('', 'Unsub')})
+
+    #Go through the spectral data and pull out abundances.
+    for subKey, subData in peaks.items():
+        mass = unsubMass if subKey == 'Unsub' else unsubMass + massChangeVsUnsub(subKey)
         correctedMass = mass + massError
 
         # Initialize or update the dictionary for correctedMass
         spectrumToPlot.setdefault(correctedMass, {'U Value': 0, 'Sub': subKey})
         spectrumToPlot[correctedMass]['U Value'] = subData
 
-    #Calculates the relative abundances, and places these, the masses, and substitutions into lists to plot. 
-        totalAbundance = sum(item['U Value'] for item in spectrumToPlot.values())
+    #Calculates the relative abundances, and places these, the masses, and substitutions into lists to plot.
+    totalAbundance = sum(item['U Value'] for item in spectrumToPlot.values())
 
-        massPlot = []
-        relAbundPlot = []
-        subPlot = []
-        for mass, data in spectrumToPlot.items():
-            relAbundance = data['U Value'] / totalAbundance
-            if relAbundance > lowAbundanceCutOff:
-                massPlot.append(mass)
-                relAbundPlot.append(relAbundance)
-                subPlot.append(data['Sub'])
+    massPlot = []
+    relAbundPlot = []
+    subPlot = []
+    for mass, data in spectrumToPlot.items():
+        relAbundance = data['U Value'] / totalAbundance
+        if relAbundance > lowAbundanceCutOff:
+            massPlot.append(mass)
+            relAbundPlot.append(relAbundance)
+            subPlot.append(data['Sub'])
             
     #Constructs a figure; does not plot peaks below the relative abundance cut off. 
     fig, ax = plt.subplots(figsize = figsize)
-    ax.vlines(massPlot, 0, relAbundPlot)
+    drawPeaks(ax, massPlot, relAbundPlot, logY = logY)
 
     # Set x-axis labels to mass and substitution info
     labels = [f"{round(mass, 5)}\n{sub}" for mass, sub in zip(massPlot, subPlot)]
@@ -100,7 +120,7 @@ def fullSpectrumVis(fullMolecule, molecularDataFrame, figsize = (8,4), massError
             
     plt.show()
 
-def MNSpectrumVis(molecularDataFrame, fragKey, predictedMeasurement, MNKey, MNDict, lowAbundanceCutOff = 0, massError = 0, xlim = (), ylim = (), outputIsotopologs = False, tolerance = 0.1):
+def MNSpectrumVis(molecularDataFrame, fragKey, predictedMeasurement, MNKey, MNDict, lowAbundanceCutOff = 0, massError = 0, xlim = (), ylim = (), outputIsotopologs = False, tolerance = 0.1, logY = False):
     '''
     Visualizes the fragmented spectrum of an M+N experiment based on the abundances of fragment peaks.
 
@@ -116,6 +136,7 @@ def MNSpectrumVis(molecularDataFrame, fragKey, predictedMeasurement, MNKey, MNDi
         ylim: as xlim. 
         outputIsotopologs: If true, outputs a isotoplogs.tsv file with the peaks in the spectrum. 
         tolerance: The tolerance setting to use for an output isotopologs.tsv. 
+        logY: If True, use a logarithmic y axis, which shows small peaks alongside large ones. 
 
     Outputs:
         None. Displays plot. 
@@ -137,7 +158,7 @@ def MNSpectrumVis(molecularDataFrame, fragKey, predictedMeasurement, MNKey, MNDi
             subPlot.append(subKey)
 
     fig, ax = plt.subplots(figsize = (10,4))
-    ax.vlines(massPlot, 0, relAbundPlot)
+    drawPeaks(ax, massPlot, relAbundPlot, logY = logY)
     ax.set_title(MNKey + ' ' + fragKey)
 
     ax.set_xticks(massPlot)

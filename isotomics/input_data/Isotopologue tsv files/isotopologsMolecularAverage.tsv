@@ -1,5 +1,5 @@
 #Compound	Isotopolog	m/z	Tolerance [mmu]	z
-Molecular Average		90.05550	0.1	1
+Molecular Average	Unsub	90.05550	0.1	1
 Molecular Average	2H	91.06178	0.1	1
 Molecular Average	2H-2H	92.06806	0.1	1
 Molecular Average	2H-2H-2H	93.07433	0.1	1

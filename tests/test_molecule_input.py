@@ -85,3 +85,45 @@ def test_missing_relative_contributions_is_an_error(tmp_path):
     path = write_molecule_csv(tmp_path / "m.csv", {"Fragment 44_01": PATHWAY_1, "Fragment 44_02": PATHWAY_2})
     with pytest.raises(ValueError, match="Relative Contribution"):
         sim.moleculeFromCsv(path, deltas=[0] * 6)
+
+
+def test_full_spectrum_includes_unsub(monkeypatch):
+    # predictedMeasurement['U Values'] omits the unsubstituted molecule (U = 1); the spectrum must add it
+    import matplotlib
+    matplotlib.use("Agg")
+    from matplotlib.axes import Axes
+    from isotomics import calcIsotopologues as ci
+    from isotomics import spectrumVis
+
+    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-11.9, -9.95, 0, 0, 0, 0])
+    predicted, _, _ = sim.simulateMeasurement(molecule, massThreshold=5)
+    plotted = {}
+    real_vlines = Axes.vlines
+    monkeypatch.setattr(Axes, "vlines", lambda self, x, ymin, ymax, *a, **k: plotted.update(x=list(x), y=list(ymax)) or real_vlines(self, x, ymin, ymax, *a, **k))
+    monkeypatch.setattr(spectrumVis.plt, "show", lambda *a, **k: None)
+
+    spectrumVis.fullSpectrumVis(predicted["U Values"], molecule["molecularDataFrame"])
+    labels = [t.get_text().split("\n")[-1] for t in spectrumVis.plt.gca().get_xticklabels()]
+    relative = dict(zip(labels, plotted["y"]))
+
+    bySub = ci.subDictionaryFromAtom(ci.inputToAtomDict(molecule["molecularDataFrame"], disable=True, M1Only=False))
+    total = sum(v["Conc"] for v in bySub.values() if v["Mass"] <= 5)
+    assert sum(plotted["y"]) == pytest.approx(1)
+    assert relative["Unsub"] == pytest.approx(bySub[""]["Conc"] / total)
+    assert relative["13C"] == pytest.approx(bySub["13C"]["Conc"] / total)
+
+
+def test_spectrum_logY(monkeypatch):
+    import matplotlib
+    matplotlib.use("Agg")
+    from isotomics import spectrumVis
+
+    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-11.9, -9.95, 0, 0, 0, 0])
+    predicted, MNDict, _ = sim.simulateMeasurement(molecule, massThreshold=2)
+    scales = []
+    monkeypatch.setattr(spectrumVis.plt, "show", lambda *a, **k: scales.append(spectrumVis.plt.gca().get_yscale()))
+
+    spectrumVis.fullSpectrumVis(predicted["U Values"], molecule["molecularDataFrame"], logY=True)
+    spectrumVis.MNSpectrumVis(molecule["molecularDataFrame"], "44", predicted, "M1", MNDict, logY=True)
+    spectrumVis.fullSpectrumVis(predicted["U Values"], molecule["molecularDataFrame"])
+    assert scales == ["log", "log", "linear"]
