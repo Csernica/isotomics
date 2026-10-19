@@ -161,3 +161,21 @@ def test_simulateSmpStd_unresolved_matches_omitted(tmp_path):
     unresolved = sim.simulateSmpStd(ALANINE, std, smp, std, unresolvedDict=UNRESOLVED_17O, **common)
     for site in ["Calphabeta", "Ccarboxyl", "Namine"]:
         assert unresolved.loc[site, "Relative Deltas"] == pytest.approx(omitted.loc[site, "Relative Deltas"], abs=0.2)
+
+
+@pytest.mark.parametrize("kwargs, message", [
+    ({"UValueList": ["13C"], "UMNSub": "15N"}, "not in UValueList"),   # anchor excluded from UValueList
+    ({"UMNSub": "18O"}, "no '18O' U value was simulated"),             # M+2 substitution, never simulated at M+1
+])
+def test_simulateSmpStd_UMNSub_must_be_simulated(tmp_path, kwargs, message):
+    std = [-12.9, -10.95, 0, 0, 0, 0]
+    with pytest.raises(ValueError, match=message):
+        sim.simulateSmpStd(ALANINE, std, std, std, MonteCarloN=2, plot=False,
+                           resultsFileName=str(tmp_path / "out.csv"), **kwargs)
+
+
+def test_simulateSmpStd_UMNSub_without_UValueList(tmp_path):
+    std = [-12.9, -10.95, 0, 0, 0, 0]
+    out = sim.simulateSmpStd(ALANINE, std, std, std, UMNSub="15N", MNError=0.001, UValueError=0.001,
+                             MonteCarloN=2, plot=False, resultsFileName=str(tmp_path / "out.csv"))
+    assert not out["Relative Deltas"].isna().any()

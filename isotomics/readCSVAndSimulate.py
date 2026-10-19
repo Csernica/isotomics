@@ -352,6 +352,11 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
     UMNSub = op.standardizeSubstitutionArgument(UMNSub, "the UMNSub argument")
     unresolvedDict = op.standardizeSubstitutionArgument(unresolvedDict, "the unresolvedDict argument")
 
+    #The solver scales by the U value of UMNSub, so it must be among the simulated U values
+    if UValueList and UMNSub not in UValueList:
+        raise ValueError(f"UMNSub is '{UMNSub}', but '{UMNSub}' is not in UValueList {UValueList}, so its U value is not "
+                         f"simulated. Add '{UMNSub}' to UValueList (or leave UValueList empty to simulate all U values).")
+
     simArgs = {
     'abundanceThreshold': abundanceThreshold,
     'UValueList': UValueList,
@@ -369,6 +374,9 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
     #Simulate observations of the sample
     thisSmp = moleculeFromCsv(path, deltas = deltasSmp)
     smpMeasurement, smpMNDict, smpFF = simulateMeasurement(thisSmp, **simArgs)
+    if UMNSub not in smpMeasurement['U Values']:
+        raise ValueError(f"UMNSub is '{UMNSub}', but no '{UMNSub}' U value was simulated (simulated: "
+                         f"{sorted(smpMeasurement['U Values'])}). Choose a UMNSub among these, or include it in UValueList.")
 
     #Simulate a forward model of the standard. 
     forwardModel = moleculeFromCsv(path, deltas = deltasStdAppx)
