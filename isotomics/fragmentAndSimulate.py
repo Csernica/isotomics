@@ -546,7 +546,12 @@ def trackMNFragments(MN, molecularDataFrame, fragmentationDictionary, unresolved
     for key in list(MN.keys()):
         massSelection = MN[key]
         for i, fragment in enumerate(expandedFrags):
-            fragmentAndTrackIsotopologues(massSelection, fragment, fragSubgeometryKeys[i], UnsubConc, molecularDataFrame, unresolvedDict = unresolvedDict)
+            #unresolvedDict is keyed by mass selection then fragment ({'M1': {'full': {'17O': '13C'}}}); the helper
+            #takes the mapping for this subgeometry, keyed by subgeometry ({'full_01': {'17O': '13C'}})
+            subgeometryKey = fragSubgeometryKeys[i]
+            fragKey = subgeometryKey.split('_')[0]
+            unresolvedHere = {subgeometryKey: unresolvedDict.get(key, {}).get(fragKey, {})}
+            fragmentAndTrackIsotopologues(massSelection, fragment, subgeometryKey, UnsubConc, molecularDataFrame, unresolvedDict = unresolvedHere)
             
     return MN
 

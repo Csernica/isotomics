@@ -249,7 +249,7 @@ def simulateMeasurement(initializedMolecule, abundanceThreshold = 0, UValueList 
         fractionationFactors: A dictionary, specifying a fractionation factor to apply to each ion beam. This is used to apply fractionation factors calculated previously to this predicted measurement (e.g. for a sample/standard comparison with the same experimental fractionation)
         omitMeasurements: omitMeasurements: A dictionary, {}, specifying measurements which I will not observed. For example, omitMeasurements = {'M1':{'61':'2H'}} would mean I do not observe the 2H ion beam of the 61 fragment of the M+1 experiment, regardless of its abundance. 
         ffstd: A float; if new fractionation factors are calculated, they are pulled from a normal distribution centered around 1, with this standard deviation.
-        unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other.
+        unresolvedDict: A dictionary, specifying which unresolved ion beams add to each other, keyed by mass selection then fragment; e.g. {'M1': {'full': {'17O': '13C'}}} adds the 17O peak of the full molecule to its 13C peak.
         outputFull: A boolean. Typically False, in which case beams that are not observed are culled from the dictionary. If True, includes this information; this should only be used for debugging, and will likely break the solver routine. 
         
     Outputs:
@@ -321,7 +321,7 @@ def plotOutput(simulationOutput, relativeDeltasActual = None, ylim = False):
 
     return fig
 
-def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold = 0, UValueList = [], massThreshold = 1,  disableProgress = True, calcFF = False, omitMeasurements = {}, ffstd = 0.05, plot = True, MonteCarloN = 100, perturbTheoryOAmt = 0, errorPath = False, MNError = 0, UValueError = 0, resultsFileName = 'output.csv', outputPrecision = 3, UMNSub = '13C'):
+def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold = 0, UValueList = [], massThreshold = 1,  disableProgress = True, calcFF = False, omitMeasurements = {}, ffstd = 0.05, plot = True, MonteCarloN = 100, perturbTheoryOAmt = 0, errorPath = False, MNError = 0, UValueError = 0, resultsFileName = 'output.csv', outputPrecision = 3, UMNSub = '13C', unresolvedDict = None):
     '''
     Parent function which constructs and runs a full sample standard comparison. 
 
@@ -339,6 +339,7 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
         resultsFileName: Name the output CSV. 
         outputPrecision: Adjust precision on the output CSV. 
         UMNSub: Choose which isotope to anchor to when calculating site-specific data. 
+        unresolvedDict: Peaks the instrument does not resolve, e.g. {'M1': {'full': {'17O': '13C'}}} adds the 17O ions of the full molecule to its 13C peak. Applied to the simulated sample and standard measurements. The solver treats the merged peak as the 13C peak and the 17O as unobserved, as with omitMeasurements; it does not use the merge to constrain sites, since that can leave sites indistinguishable (e.g. carboxyl 13C and 17O in alanine). 
 
     Outputs:
         simulationOutput: A dataframe containing the results of the simulation. Also produces a cleaned CSV containing the most relevant pieces of information. Also plots these data (if plot). 
@@ -349,6 +350,8 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
     MNError = op.standardizeSubstitutionArgument(MNError, "the MNError argument")
     UValueError = op.standardizeSubstitutionArgument(UValueError, "the UValueError argument")
     UMNSub = op.standardizeSubstitutionArgument(UMNSub, "the UMNSub argument")
+    unresolvedDict = op.standardizeSubstitutionArgument(unresolvedDict, "the unresolvedDict argument")
+
     simArgs = {
     'abundanceThreshold': abundanceThreshold,
     'UValueList': UValueList,
@@ -356,7 +359,8 @@ def simulateSmpStd(path, deltasStd, deltasSmp, deltasStdAppx, abundanceThreshold
     'disableProgress': disableProgress,
     'calcFF': calcFF,
     'omitMeasurements': omitMeasurements,
-    'ffstd': ffstd}
+    'ffstd': ffstd,
+    'unresolvedDict': unresolvedDict}
 
     #Simulate observations of the standard
     thisStd = moleculeFromCsv(path, deltas = deltasStd)

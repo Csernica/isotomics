@@ -127,3 +127,37 @@ def test_spectrum_logY(monkeypatch):
     spectrumVis.MNSpectrumVis(molecule["molecularDataFrame"], "44", predicted, "M1", MNDict, logY=True)
     spectrumVis.fullSpectrumVis(predicted["U Values"], molecule["molecularDataFrame"])
     assert scales == ["log", "log", "linear"]
+
+
+UNRESOLVED_17O = {"M1": {"full": {"17O": "13C"}}}
+
+
+def test_unresolved_relabels_isotopologues_documented_format():
+    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-11.9, -9.95, 0, 0, 0, 0])
+    _, MNDict, _ = sim.simulateMeasurement(molecule, unresolvedDict=UNRESOLVED_17O)
+    oxygen17 = [iso for iso in MNDict["M1"].values() if iso["Subs"] == "17O"]
+    assert oxygen17 and all(iso["full_01 Subs"] == "13C" for iso in oxygen17)  # merged in the full molecule
+    assert all(iso["44_01 Subs"] == "Unsub" for iso in oxygen17)  # fragment 44 loses the carboxyl O; unaffected
+
+
+def test_unresolved_spectrum_columns():
+    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-11.9, -9.95, 0, 0, 0, 0])
+    plain, _, _ = sim.simulateMeasurement(molecule)
+    merged, _, _ = sim.simulateMeasurement(molecule, unresolvedDict=UNRESOLVED_17O)
+    full = plain["M1"]["full"]
+    assert "17O" not in merged["M1"]["full"]
+    assert merged["M1"]["full"]["13C"]["Rel. Abundance"] == pytest.approx(full["13C"]["Rel. Abundance"])
+    assert merged["M1"]["full"]["13C"]["Combined Rel. Abundance"] == pytest.approx(
+        full["13C"]["Rel. Abundance"] + full["17O"]["Rel. Abundance"])
+    assert merged["M1"]["44"] == plain["M1"]["44"]
+
+
+def test_simulateSmpStd_unresolved_matches_omitted(tmp_path):
+    std = [-12.9, -10.95, 0, 0, 0, 0]
+    smp = [-12.656, 21.685, 0, 0, 0, 0]
+    common = dict(UValueList=["13C"], MNError=1e-6, UValueError=1e-6, MonteCarloN=5, plot=False,
+                  resultsFileName=str(tmp_path / "out.csv"))
+    omitted = sim.simulateSmpStd(ALANINE, std, smp, std, omitMeasurements={"M1": {"full": ["17O"]}}, **common)
+    unresolved = sim.simulateSmpStd(ALANINE, std, smp, std, unresolvedDict=UNRESOLVED_17O, **common)
+    for site in ["Calphabeta", "Ccarboxyl", "Namine"]:
+        assert unresolved.loc[site, "Relative Deltas"] == pytest.approx(omitted.loc[site, "Relative Deltas"], abs=0.2)
