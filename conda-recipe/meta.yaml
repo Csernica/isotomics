@@ -9,7 +9,7 @@ package:
 # above and paste the sdist's sha256 from https://pypi.org/project/isotomics/#files
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: FILL_IN_AFTER_PYPI_RELEASE
+  sha256: d56d745f8a18836b5996875e59b60499d70b1a504e07295e475c04e4a18d8681
 
 build:
   noarch: python
