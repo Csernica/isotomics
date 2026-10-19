@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.1 (2026-10-19)
+
+### Fixed
+
+- `fullSpectrumVis` left out the unsubstituted (`Unsub`) peak, so it was missing from the plot and
+  every other peak was normalized against the wrong total.
+- The unsubstituted molecular-average peak was unlabeled in plots and in IsoX peak lists written with
+  `outputIsotopologs=True`; it is now `Unsub`, matching `.isox` data.
+- `unresolvedDict` in the documented format (`{'M1': {'full': {'17O': '13C'}}}`) was silently
+  ignored by `trackMNFragments`.
+- `simulateSmpStd` returned all-`NaN` results when the U value named by `UMNSub` was not simulated;
+  it now raises an error explaining how to fix it.
+
+### New
+
+- `logY` option for `fullSpectrumVis` and `MNSpectrumVis`.
+- `simulateSmpStd` accepts `unresolvedDict`.
+- The simulation tutorial covers unresolved and unobserved peaks, `UMNSub` and `perturbTheoryOAmt`.
+
 ## 0.2.0 (2026-10-16)
 
 ### Breaking changes
