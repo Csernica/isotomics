@@ -16,12 +16,12 @@ def RSESNScreen(rtnAllFilesDF, MNRelativeAbundance = False, threshold = 2):
 
     Inputs:
         rtnAllFilesDf: A dataframe containing all of the output ratios, from dataAnalyzerMN.calc_Folder_Output
+        MNRelativeAbundance: True if the rows are M+N relative abundances, False if they are isotope ratios.
+        threshold: Flag measurements whose relative standard error exceeds this multiple of their shot-noise limit.
 
     Outputs:
-        None. Prints flags for peaks that exceed the threshold. 
+        None. Prints flags for peaks that exceed the threshold.
     '''
-    MN_Relative_Abundance = True
-    threshold = 2
     rtnAllFilesDF['RSE over SN'] = rtnAllFilesDF['RelStdError'] / rtnAllFilesDF['ShotNoise']
     subColumn = 'MN Relative Abundance' if MNRelativeAbundance else 'IsotopeRatio'
     failSN = rtnAllFilesDF.loc[rtnAllFilesDF['RSE over SN'] > threshold]
@@ -108,10 +108,10 @@ def peakDriftScreen(mergedDict, threshold = 2):
 
                 peakDrift = np.abs(massDiffObserve - massDiffTheory)
 
-                peakDriftppm = peakDrift / observedMassIso * 10**6
+                peakDriftppm = peakDrift / thisMassObs * 10**6
 
                 if peakDriftppm > threshold:
-                    print("Peak Drift Observed for " + fileKey + " " + iso + " with size " + str(peakDriftppm))
+                    print("Peak Drift Observed for " + fileKey + " " + thisIso + " with size " + str(peakDriftppm))
 
 def subsequenceOutlierDetection(timeSeries, priorSubsequenceLength = 1000, testSubsequenceLength = 1000):
     '''
