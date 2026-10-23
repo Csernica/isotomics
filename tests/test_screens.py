@@ -52,3 +52,16 @@ def test_RSESNThreshold_reaches_the_screen(capsys):
     assert "fails RSE/SN test" not in capsys.readouterr().out
     dA.calc_Folder_Output([isox], RSESNThreshold=0, **common)  # every measurement exceeds 0
     assert "fails RSE/SN test" in capsys.readouterr().out
+
+
+def test_readIsoX_rejects_multiple_compounds(tmp_path):
+    isox = resources.files("isotomics") / "input_data" / "Experimental_Data" / "44" / "Smp" / "20211006_07_Alanine_C1-1_M1_rep1.isox"
+    one = pd.read_csv(isox, sep="\t")
+    dA.readIsoX(str(isox))  # a single compound reads normally
+
+    other = one.copy()
+    other["compound"] = "X"
+    path = tmp_path / "two_fragments.isox"
+    pd.concat([one, other]).to_csv(path, sep="\t", index=False)
+    with pytest.raises(ValueError, match="this file contains compounds Ala44 and X; isotomics expects one fragment per file"):
+        dA.readIsoX(str(path))

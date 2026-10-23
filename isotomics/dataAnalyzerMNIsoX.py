@@ -23,9 +23,22 @@ def readIsoX(filePath):
         fileName: A string; the name of the file ('combined.isox')
 
     Outputs:
-        IsoXDf: A dataframe with the data from the .csv output. 
+        IsoXDf: A dataframe with the data from the .csv output.
+
+    Raises:
+        ValueError: If the file contains more than one compound. Peaks are identified by isotopolog name only,
+        so the peaks of different fragments in one file would be mixed together.
     '''
     IsoXDf = pd.read_csv(filePath, sep = '\t')
+
+    #One fragment per file: peaks are matched by isotopolog name alone, so several compounds would be mixed
+    if 'compound' in IsoXDf.columns:
+        compounds = [str(c) for c in IsoXDf['compound'].dropna().unique()]
+        if len(compounds) > 1:
+            listed = ', '.join(compounds[:-1]) + ' and ' + compounds[-1]
+            raise ValueError(f"{filePath}: this file contains compounds {listed}; isotomics expects one fragment per file. "
+                             "Each compound should be exported to its own file and folder.")
+
     IsoXDf['isotopolog'] = op.standardizeSubstitutionNames(IsoXDf['isotopolog'], '.isox data')
 
     IsoXDf.drop(columns=['ions.incremental','peakResolution','basePeakIntensity','rawOvFtT','intensCompFactor','agc','analyzerTemperature','numberLockmassesFound'], inplace = True)
