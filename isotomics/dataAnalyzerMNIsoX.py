@@ -126,23 +126,26 @@ def combine_Substituted_Peaks(splitDf, cullOn = None, cullAmt = 3, scanNumber = 
     MNRelativeAbundance: Calculate MN Relative Abundances rather than ratios. 
     '''
     combinedData = {}
-    subIdx = 0 
     subNameList = []
+    #Scan-level columns are the same for every peak in a scan; the rest describe one peak
+    scanColumns = ['filename','retTime','compound','tic','TIC*IT','integTime','resolution','agcTarget','microscans']
+    scanRows = []
+    peakTables = []
     for subName, subData in splitDf:
         if subName == 'M0':
             subName = 'Unsub'
         subNameList.append(subName)
         subData = calculate_Counts_And_ShotNoise(subData)
-        subData.rename(columns={'counts':'counts' + subName,'mass':'mass'+subName,'intensity':'intensity'+subName,'peakNoise':'peakNoise'+subName},inplace = True)
+        subData = subData.rename(columns={'counts':'counts' + subName,'mass':'mass'+subName,'intensity':'intensity'+subName,'peakNoise':'peakNoise'+subName})
 
-        if subIdx == 0:
-            baseDf = copy.deepcopy(subData)
-        else:
-            subData.drop(columns=['filename','retTime','compound','isotopolog','tic','TIC*IT','integTime','resolution','agcTarget','microscans'], inplace=True)
+        scanRows.append(subData[['scanNumber'] + [c for c in scanColumns if c in subData.columns]])
+        peakTables.append(subData[['scanNumber', 'intensity' + subName, 'peakNoise' + subName, 'mass' + subName, 'counts' + subName]])
 
-            baseDf = pd.merge_ordered(baseDf, subData,on='scanNumber',suffixes =(False,False))
-
-        subIdx += 1
+    #Take each scan's scan-level values from whichever peaks were observed in it, so that a scan is kept
+    #(with its time and TIC) even if a particular peak is missing from it
+    baseDf = pd.concat(scanRows).groupby('scanNumber', as_index=False).first()
+    for peakTable in peakTables:
+        baseDf = pd.merge_ordered(baseDf, peakTable, on='scanNumber')
 
     #If there are no entries for a given scan, IsoX will not include that scan in the output. 
     #This fills in 0s for all entries between the minimum and maximum scan

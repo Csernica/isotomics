@@ -65,3 +65,23 @@ def test_readIsoX_rejects_multiple_compounds(tmp_path):
     pd.concat([one, other]).to_csv(path, sep="\t", index=False)
     with pytest.raises(ValueError, match="this file contains compounds Ala44 and X; isotomics expects one fragment per file"):
         dA.readIsoX(str(path))
+
+
+def test_scans_kept_when_first_peak_is_missing(tmp_path):
+    # '13C' sorts first among the peaks; remove it from 200 scans inside the time window
+    isox = resources.files("isotomics") / "input_data" / "Experimental_Data" / "44" / "Smp" / "20211006_07_Alanine_C1-1_M1_rep1.isox"
+    raw = pd.read_csv(isox, sep="\t")
+    inWindow = raw.loc[raw["time.min"].between(5, 15), "scan.no"].drop_duplicates()
+    dropScans = set(inWindow.iloc[1000:1200])
+    thinned = raw[~((raw["isotopolog"] == "13C") & raw["scan.no"].isin(dropScans))]
+    path = tmp_path / "missing13C.isox"
+    thinned.to_csv(path, sep="\t", index=False)
+
+    _, merged = dA.calc_Folder_Output([str(path)], timeBounds=(5, 15), MNRelativeAbundance=True,
+                                      RSESNScreen=False, zeroCountsScreen=False, peakDriftScreen=False)
+    df = next(iter(merged.values()))["mergedDf"]
+    assert "isotopolog" not in df.columns
+    assert set(inWindow) <= set(df["scanNumber"])                       # no scans lost
+    missing = df[df["scanNumber"].isin(dropScans)]
+    assert len(missing) == 200 and (missing["counts13C"] == 0).all()   # 13C absent there...
+    assert (missing["retTime"] > 0).all() and (missing["tic"] > 0).all()  # ...but the scans keep their time and TIC
