@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.2 (2026-10-27)
+
+### Fixed
+
+- Processing silently dropped scans in which the alphabetically first peak (e.g. ¹³C) was not
+  detected: their time was recorded as 0, so the time window excluded them. Scans are now kept as
+  long as any peak was observed. Results for the bundled data are unchanged.
+- `.isox` files containing more than one compound now raise an error. Peaks are identified by name
+  only, so several fragments in one file were silently mixed together; each compound should be
+  exported to its own file and folder.
+- `peakDriftScreen` warnings named the last peak in the list rather than the one that drifted, and
+  converted the drift to ppm with the wrong mass.
+- `RSESNScreen` ignored its threshold argument (always 2).
+
+### New
+
+- `RSESNThreshold` (default 2) in `processIndividualAndAverageIsotopeRatios`, alongside the other
+  screening thresholds, which are now documented.
+- The scan tables in `rtnMergedDict` no longer include a meaningless `isotopolog` column.
+- The experimental tutorial covers the data layout, processing and the screening options.
+
 ## 0.2.1 (2026-10-19)
 
 ### Fixed
