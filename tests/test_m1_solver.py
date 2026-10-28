@@ -1,6 +1,7 @@
 from importlib import resources
 
 import numpy as np
+import pytest
 import pandas as pd
 
 from isotomics import dataAnalyzerMNIsoX as data_analyzer
@@ -32,6 +33,18 @@ def test_m1_solver_smoke(tmp_path, monkeypatch):
         zeroCountsThreshold=0,
         RSESNScreen=True,
     )
+
+    # Errors of the mean are divided by the number of files in each group (3 sample, 4 standard for fragment 44)
+    perFile = pd.read_csv(tmp_path / "all_data_output.csv")
+    for _, row in rtn_means[rtn_means["Fragment"] == "44"].iterrows():
+        group = perFile[(perFile["Fragment"].astype(str) == "44") & (perFile["File Type"] == row["File Type"])
+                        & (perFile["MN Relative Abundance"] == row["MN Relative Abundance"])]
+        assert len(group) == {"Smp": 3, "Std": 4}[row["File Type"]]
+        assert row["RelStdError"] == pytest.approx(group["RelStdError"].mean() / np.sqrt(len(group)))
+
+    # The isotope ratio column sits next to the M+N relative abundance column
+    cols = list(rtn_means.columns)
+    assert cols.index("IsotopeRatio") == cols.index("MN Relative Abundance") + 1
 
     output_df = solveExperimentalData.experimentalDataM1(
         rtn_means,

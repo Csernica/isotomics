@@ -68,12 +68,12 @@ One row per site, labeled by the `Site Names` from the molecule CSV. You should 
 
 | Site Names | Element (atoms) | Relative Deltas (‰) | CRF Deltas (‰) |
 | --- | --- | --- | --- |
-| Calphabeta | C (2) | −0.151 ± 0.399 | −12.050 ± 0.394 |
-| Ccarboxyl | C (1) | 31.961 ± 0.782 | 21.693 ± 0.774 |
-| Ocarboxyl | O (2) | −0.591 ± 15.617 | −0.591 ± 15.617 |
-| Namine | N (1) | −0.711 ± 1.054 | −0.711 ± 1.054 |
-| Hretained | H (6) | 1.046 ± 1.257 | 1.046 ± 1.257 |
-| Hlost | H (2) | 3.724 ± 14.563 | 3.724 ± 14.563 |
+| Calphabeta | C (2) | −0.151 ± 0.382 | −12.049 ± 0.378 |
+| Ccarboxyl | C (1) | 31.960 ± 0.748 | 21.692 ± 0.740 |
+| Ocarboxyl | O (2) | −0.634 ± 15.298 | −0.634 ± 15.298 |
+| Namine | N (1) | −0.720 ± 0.919 | −0.720 ± 0.919 |
+| Hretained | H (6) | 1.055 ± 1.168 | 1.055 ± 1.168 |
+| Hlost | H (2) | 3.891 ± 12.755 | 3.891 ± 12.755 |
 
 - **Relative Deltas** are the sample relative to the standard. This sample is enriched by about
   32 ‰ in the carboxyl carbon and is otherwise indistinguishable from the standard within error.

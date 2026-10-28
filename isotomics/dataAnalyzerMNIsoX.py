@@ -490,22 +490,16 @@ def processIndividualAndAverageIsotopeRatios(fragmentFolderPaths, cwd, outputToC
         allDataReturnedDFList.append(rtnAllFilesDF)
         allMergedDict.append(mergedDict)
     
-        #Compute means of sample and stanadrd
-        if  MN_RELATIVE_ABUNDANCE == True:
-            thisSortedAverageDF = rtnAllFilesDF.sort_values(by=['MN Relative Abundance', 'File Type'])
-            nFiles = thisSortedAverageDF.groupby(['MN Relative Abundance', 'File Type'])['RelStdError'].transform('size')[0]
-            means = thisSortedAverageDF.groupby(['MN Relative Abundance', 'File Type']).mean(numeric_only = True).reset_index()
-            means['RelStdError'] /= np.sqrt(nFiles)
-            means['StdError'] /= np.sqrt(nFiles)
-            means['Fragment'] = thisFolderName
-
-        else:
-            thisSortedAverageDF = rtnAllFilesDF.sort_values(by=['IsotopeRatio', 'File Type'])
-            nFiles = thisSortedAverageDF.groupby(['IsotopeRatio', 'File Type'])['RelStdError'].transform('size')[0]
-            means = thisSortedAverageDF.groupby(['IsotopeRatio', 'File Type']).mean(numeric_only = True).reset_index()
-            means['RelStdError'] /= np.sqrt(nFiles)
-            means['StdError'] /= np.sqrt(nFiles)
-            means['Fragment'] = thisFolderName
+        #Compute means of sample and standard. The errors of the mean are divided by the square root of the number of
+        #files in each group, which can differ between sample and standard (e.g. 3 sample and 4 standard acquisitions)
+        quantity = 'MN Relative Abundance' if MN_RELATIVE_ABUNDANCE else 'IsotopeRatio'
+        grouped = rtnAllFilesDF.groupby([quantity, 'File Type'])
+        means = grouped.mean(numeric_only = True)
+        nFiles = grouped.size().reindex(means.index)
+        means['RelStdError'] /= np.sqrt(nFiles)
+        means['StdError'] /= np.sqrt(nFiles)
+        means = means.reset_index()
+        means['Fragment'] = thisFolderName
         
         #add to output list
         allSortedMeanIsotopeRatios.append(means)
@@ -518,6 +512,11 @@ def processIndividualAndAverageIsotopeRatios(fragmentFolderPaths, cwd, outputToC
     #Add the means from each folder to a combined dataframe
     rtnData = pd.concat(allDataReturnedDFList, ignore_index=True)
     rtnMeans = pd.concat(allSortedMeanIsotopeRatios, ignore_index=True)
+    #Show what was measured side by side: the M+N relative abundance peak and the isotope ratio
+    if 'MN Relative Abundance' in rtnMeans.columns and 'IsotopeRatio' in rtnMeans.columns:
+        cols = [c for c in rtnMeans.columns if c != 'IsotopeRatio']
+        cols.insert(cols.index('MN Relative Abundance') + 1, 'IsotopeRatio')
+        rtnMeans = rtnMeans[cols]
 
     #Output data frame to csv
     if outputToCSV:
