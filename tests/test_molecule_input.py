@@ -95,7 +95,7 @@ def test_full_spectrum_includes_unsub(monkeypatch):
     from isotomics import calcIsotopologues as ci
     from isotomics import spectrumVis
 
-    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-11.9, -9.95, 0, 0, 0, 0])
+    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-9.95, -11.9, 0, 0, 0, 0])
     predicted, _, _ = sim.simulateMeasurement(molecule, massThreshold=5)
     plotted = {}
     real_vlines = Axes.vlines
@@ -118,7 +118,7 @@ def test_spectrum_logY(monkeypatch):
     matplotlib.use("Agg")
     from isotomics import spectrumVis
 
-    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-11.9, -9.95, 0, 0, 0, 0])
+    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-9.95, -11.9, 0, 0, 0, 0])
     predicted, MNDict, _ = sim.simulateMeasurement(molecule, massThreshold=2)
     scales = []
     monkeypatch.setattr(spectrumVis.plt, "show", lambda *a, **k: scales.append(spectrumVis.plt.gca().get_yscale()))
@@ -133,7 +133,7 @@ UNRESOLVED_17O = {"M1": {"full": {"17O": "13C"}}}
 
 
 def test_unresolved_relabels_isotopologues_documented_format():
-    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-11.9, -9.95, 0, 0, 0, 0])
+    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-9.95, -11.9, 0, 0, 0, 0])
     _, MNDict, _ = sim.simulateMeasurement(molecule, unresolvedDict=UNRESOLVED_17O)
     oxygen17 = [iso for iso in MNDict["M1"].values() if iso["Subs"] == "17O"]
     assert oxygen17 and all(iso["full_01 Subs"] == "13C" for iso in oxygen17)  # merged in the full molecule
@@ -141,7 +141,7 @@ def test_unresolved_relabels_isotopologues_documented_format():
 
 
 def test_unresolved_spectrum_columns():
-    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-11.9, -9.95, 0, 0, 0, 0])
+    molecule = sim.moleculeFromCsv(ALANINE, deltas=[-9.95, -11.9, 0, 0, 0, 0])
     plain, _, _ = sim.simulateMeasurement(molecule)
     merged, _, _ = sim.simulateMeasurement(molecule, unresolvedDict=UNRESOLVED_17O)
     full = plain["M1"]["full"]

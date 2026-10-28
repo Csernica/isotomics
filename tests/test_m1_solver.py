@@ -14,7 +14,7 @@ def test_m1_solver_smoke(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     input_root = resources.files("isotomics").joinpath("input_data")
     molecule_input_path = str(input_root / "Example_Molecule_Input.csv")
-    standard_delta_approx = [-11.9, -9.95, 0, 0, 0, 0]
+    standard_delta_approx = [-9.95, -11.9, 0, 0, 0, 0]
 
     fragment_folder_paths = organizeData.get_subfolder_paths(
         str(input_root / "Experimental_Data")
@@ -86,7 +86,7 @@ def test_bundled_processed_table_matches_raw_processing(tmp_path, monkeypatch):
     bundled = pd.read_csv(input_root / "Experimental_Data_Input.csv")
 
     args = dict(cwd=tmp_path, MOLECULE_INPUT_PATH=str(input_root / "Example_Molecule_Input.csv"),
-                std_deltas=[-11.9, -9.95, 0, 0, 0, 0], UValue="13C/Unsub", mAObs=-0.8, mARelErr=0.0001,
+                std_deltas=[-9.95, -11.9, 0, 0, 0, 0], UValue="13C/Unsub", mAObs=-0.8, mARelErr=0.0001,
                 perturbTheoryOAmt=0.0003, MonteCarloN=50, plot=False, resultsFileName="out.csv")
     from_raw = solveExperimentalData.experimentalDataM1(rtn_means, **args)
     from_table = solveExperimentalData.experimentalDataM1(bundled, **args)

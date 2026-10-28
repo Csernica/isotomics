@@ -29,7 +29,8 @@ isotomics-quickstart
    scans from 5 to 15 minutes and screening each file for peak drift, zero-intensity scans and
    poor signal-to-noise.
 3. Solves for the sample's site-specific δ values with the M+1 Monte Carlo routine, using the
-   standard's known carbon values (−11.9 and −9.95 ‰) and the sample's molecular-average
+   standard's known carbon values (−9.95 ‰ for the α/β carbons, the mean of C-2 and C-3, and −11.9 ‰
+   for the carboxyl carbon, C-1; Weiss et al., 2023) and the sample's molecular-average
    δ¹³C (−0.8 ± 0.1 ‰, from an external measurement).
 
 The terminal shows each folder as it is processed (with the files it read), then:
@@ -68,15 +69,15 @@ One row per site, labeled by the `Site Names` from the molecule CSV. You should 
 
 | Site Names | Element (atoms) | Relative Deltas (‰) | CRF Deltas (‰) |
 | --- | --- | --- | --- |
-| Calphabeta | C (2) | −0.151 ± 0.382 | −12.049 ± 0.378 |
-| Ccarboxyl | C (1) | 31.960 ± 0.748 | 21.692 ± 0.740 |
-| Ocarboxyl | O (2) | −0.634 ± 15.298 | −0.634 ± 15.298 |
-| Namine | N (1) | −0.720 ± 0.919 | −0.720 ± 0.919 |
-| Hretained | H (6) | 1.055 ± 1.168 | 1.055 ± 1.168 |
-| Hlost | H (2) | 3.891 ± 12.755 | 3.891 ± 12.755 |
+| Calphabeta | C (2) | −0.785 ± 0.382 | −10.727 ± 0.378 |
+| Ccarboxyl | C (1) | 31.321 ± 0.750 | 19.049 ± 0.741 |
+| Ocarboxyl | O (2) | −1.362 ± 15.296 | −1.362 ± 15.296 |
+| Namine | N (1) | −1.364 ± 0.919 | −1.364 ± 0.919 |
+| Hretained | H (6) | 0.429 ± 1.167 | 0.429 ± 1.167 |
+| Hlost | H (2) | 3.135 ± 12.747 | 3.135 ± 12.747 |
 
 - **Relative Deltas** are the sample relative to the standard. This sample is enriched by about
-  32 ‰ in the carboxyl carbon and is otherwise indistinguishable from the standard within error.
+  31 ‰ in the carboxyl carbon, and its α and β carbons are slightly lighter (about −0.8 ‰).
 - **CRF Deltas** are the same results in the reference frame of the standard values supplied to
   the solver (`Standard Delta Values in CRF`). Only the carbon sites were known for this
   standard, so the other sites are 0 there and their CRF values equal their relative values.

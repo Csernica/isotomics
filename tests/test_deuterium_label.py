@@ -12,7 +12,7 @@ from isotomics import solveExperimentalData
 
 DATA = resources.files("isotomics") / "input_data"
 MOLECULE = str(DATA / "Example_Molecule_Input.csv")
-STD = [-11.9, -9.95, 0, 0, 0, 0]
+STD = [-9.95, -11.9, 0, 0, 0, 0]
 
 
 @pytest.fixture(autouse=True)

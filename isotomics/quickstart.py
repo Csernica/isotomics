@@ -33,7 +33,8 @@ def main():
         RSE_SN_SCREEN = True
 
         # Molecular-average constraints (from external measurement or Orbitrap)
-        STANDARD_DELTA_APPROX = [-11.9, -9.95, 0, 0, 0, 0]
+        # Standard: Calphabeta = mean of C-2 (-12.9) and C-3 (-7.0), Ccarboxyl = C-1 (-11.9); Weiss et al. (2023), Table 2
+        STANDARD_DELTA_APPROX = [-9.95, -11.9, 0, 0, 0, 0]
         MOLECULAR_AVERAGE_SAMPLE_COMPOSITION = -0.8
         MOLECULAR_AVG_SAMPLE_ERROR = 0.0001  # relative error as a fraction (0.1 per mil)
         U_VALUE = "13C/Unsub"
