@@ -105,7 +105,7 @@ def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = 
     existing = [c for c in toRound if c in cleanExperimentalOutput.columns]
     if existing:
         cleanExperimentalOutput[existing] = cleanExperimentalOutput[existing].round(decimals=outputPrecision)
-    print(f"Writing experimental results to CSV: {resultsFileName}")
+    print(f"Writing experimental results to CSV: {os.path.abspath(resultsFileName)}")
     cleanExperimentalOutput.to_csv(resultsFileName, index_label='Site Names')
     print("CSV write complete.")
 
@@ -113,7 +113,7 @@ def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = 
         fig = sim.plotOutput(mDf)
         if plotPath is not None:
             fig.savefig(plotPath, dpi=150, bbox_inches='tight')
-            print(f"Saved plot: {plotPath}")
+            print(f"Saved plot: {os.path.abspath(plotPath)}")
 
     return cleanExperimentalOutput
 

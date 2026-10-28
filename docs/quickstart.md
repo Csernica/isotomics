@@ -36,12 +36,13 @@ isotomics-quickstart
 The terminal shows each folder as it is processed (with the files it read), then:
 
 ```text
-Writing experimental results to CSV: M1Output.csv
+Writing experimental results to CSV: <your folder>/M1Output.csv
 CSV write complete.
-Saved plot: M1Output.png
+Saved plot: <your folder>/M1Output.png
 ```
 
-It writes three files: `all_data_output.csv`, `M1Output.csv` and `M1Output.png`.
+It writes three files to the current folder, shown with their full paths: `all_data_output.csv`,
+`M1Output.csv` and `M1Output.png`.
 
 You will also see a warning that the deuterium label `D` was renamed to `2H`. This is expected:
 the bundled raw `.isox` files predate the `2H` label, and isotomics renames it when reading them.

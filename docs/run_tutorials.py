@@ -7,7 +7,8 @@ changing any code cell (text-only edits don't need it):
     python docs/run_tutorials.py docs/tutorials/simulation_workflow.ipynb
 
 Each notebook runs with docs/tutorials as its working directory. Local paths to the installed
-package (e.g. C:\\Users\\you\\...\\isotomics) are replaced with <isotomics> in the saved outputs.
+package (e.g. C:\\Users\\you\\...\\isotomics) are replaced with <isotomics> in the saved outputs,
+and paths in the notebook's own folder (e.g. the results files it writes) with <working folder>.
 """
 import os
 import re
@@ -38,6 +39,10 @@ def main(paths):
         text = nbformat.writes(nb)
         for pattern in scrubs:
             text = pattern.sub(lambda m: "<isotomics>", text)
+        # Files the notebook writes are printed with full paths; show them relative to its folder
+        folder = str(path.resolve().parent)
+        for p in (folder, folder.replace("\\", "\\\\")):
+            text = re.compile(re.escape(p), re.IGNORECASE).sub(lambda m: "<working folder>", text)
         nb = nbformat.reads(text, as_version=4)
         nbformat.write(nb, path)
 
