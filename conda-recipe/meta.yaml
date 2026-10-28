@@ -1,5 +1,5 @@
 {% set name = "isotomics" %}
-{% set version = "0.2.2" %}
+{% set version = "0.2.3" %}
 
 package:
   name: {{ name }}
@@ -9,7 +9,7 @@ package:
 # above and paste the sdist's sha256 from https://pypi.org/project/isotomics/#files
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: ec0038d4703626ca608a58f5e02c27d3c5013ecc2de4c7d2b367beb2f06d8ddd
+  sha256: FILL_IN_AFTER_PYPI_RELEASE
 
 build:
   noarch: python

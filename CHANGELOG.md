@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.3 (2026-10-28)
+
+### Fixed
+
+- **Errors of replicate averages, which changes results.** `rtnMeans` divided the errors of the mean
+  by the square root of a single file count for every group, rather than counting the sample and
+  standard files of each quantity separately. With 3 sample and 4 or 6 standard acquisitions, as in
+  the bundled data, the standard's errors were overstated by 1.15× and 1.41×. δ values are
+  essentially unchanged, but their errors shrink (e.g. carboxyl carbon 31.961 ± 0.782 →
+  31.960 ± 0.748 ‰).
+- The shot-noise limit of M+N relative abundances now follows eq. S.12 of the supplement to
+  Csernica et al. (High-dimensional isotomics, part 2). The old formula overestimated it, most for
+  the dominant peak (RSE/SN for ¹³C in fragment 44 was 0.61, now 1.40). This affects the
+  `ShotNoise` and `RSE over SN` columns and the RSE/SN screen, not the solver.
+- The bundled processed-data table (`Experimental_Data_Input.csv`) was regenerated with the
+  corrected errors, so solving from it matches processing the raw files.
+
+### Changed
+
+- In `rtnMeans`, the `IsotopeRatio` column is next to `MN Relative Abundance`.
+
 ## 0.2.2 (2026-10-27)
 
 ### Fixed
