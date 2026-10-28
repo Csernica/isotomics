@@ -85,3 +85,21 @@ def test_scans_kept_when_first_peak_is_missing(tmp_path):
     missing = df[df["scanNumber"].isin(dropScans)]
     assert len(missing) == 200 and (missing["counts13C"] == 0).all()   # 13C absent there...
     assert (missing["retTime"] > 0).all() and (missing["tic"] > 0).all()  # ...but the scans keep their time and TIC
+
+
+def test_MN_relative_abundance_shot_noise_matches_counting_statistics():
+    # With pure Poisson counting noise, the observed RSE of each M+N relative abundance should equal its
+    # shot-noise limit (eq. S.12), so RSE/SN = 1 for every peak, including the dominant one
+    rng = np.random.default_rng(0)
+    nScans = 20000
+    mergedDf = pd.DataFrame({"counts" + k: rng.poisson(v, nScans).astype(float)
+                             for k, v in {"13C": 4000, "Unsub": 1130, "15N": 650, "2H": 155}.items()})
+    subs = ["13C", "15N", "2H", "Unsub"]
+    mergedDf["total Counts"] = mergedDf[["counts" + s for s in subs]].sum(axis=1)
+    for s in subs:
+        mergedDf["MN Relative Abundance " + s] = mergedDf["counts" + s] / mergedDf["total Counts"]
+    mergedDf["tic"] = 1.0
+
+    out = dA.output_Raw_File_MN_Rel_Abundance(mergedDf, subs, massStr="44")["44"]
+    for s in subs:
+        assert out[s]["RelStError"] / out[s]["ShotNoiseLimit"] == pytest.approx(1, abs=0.05), s

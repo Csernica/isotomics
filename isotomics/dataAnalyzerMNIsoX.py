@@ -247,10 +247,12 @@ def output_Raw_File_MN_Rel_Abundance(mergedDf, subNameList, massStr = None):
         rtnDict[massStr][sub]['TIC*ITVar'] = 0
         rtnDict[massStr][sub]['TIC*ITMean'] = 0
                         
-        a = mergedDf['counts' + sub].sum()
-        b = mergedDf['total Counts'].sum()
-        shotNoiseByQuad = np.power((1./a + 1./b), 0.5)
-        rtnDict[massStr][sub]['ShotNoiseLimit'] = shotNoiseByQuad
+        #Shot noise limit on the relative standard error of f = A / (A + B), where A is this peak and B all other
+        #peaks (eq. S.12 of the supplement to Csernica et al., High-dimensional isotomics part 2):
+        #sigma_SN = N_B / (N_A + N_B) * sqrt(1/N_A + 1/N_B), with N_A, N_B the total counts over all scans
+        nA = mergedDf['counts' + sub].sum()
+        nB = mergedDf['total Counts'].sum() - nA
+        rtnDict[massStr][sub]['ShotNoiseLimit'] = nB / (nA + nB) * np.power((1./nA + 1./nB), 0.5)
         
     return rtnDict        
 
