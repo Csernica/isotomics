@@ -73,3 +73,22 @@ def test_m1_solver_smoke(tmp_path, monkeypatch):
     written = pd.read_csv(tmp_path / "M1Output.csv")
     assert written["Site Names"].tolist() == output_df.index.tolist()
     assert (tmp_path / "all_data_output.csv").exists()
+
+
+def test_bundled_processed_table_matches_raw_processing(tmp_path, monkeypatch):
+    # Experimental_Data_Input.csv is the processed form of the bundled .isox files, so both routes must agree
+    monkeypatch.chdir(tmp_path)
+    input_root = resources.files("isotomics").joinpath("input_data")
+    rtn_means, _ = data_analyzer.processIndividualAndAverageIsotopeRatios(
+        organizeData.get_subfolder_paths(str(input_root / "Experimental_Data")), tmp_path,
+        file_extension=".isox", processed_data_subfolder=".", time_bounds=(5, 15),
+        peakDriftScreen=False, zeroCountsScreen=False, RSESNScreen=False)
+    bundled = pd.read_csv(input_root / "Experimental_Data_Input.csv")
+
+    args = dict(cwd=tmp_path, MOLECULE_INPUT_PATH=str(input_root / "Example_Molecule_Input.csv"),
+                std_deltas=[-11.9, -9.95, 0, 0, 0, 0], UValue="13C/Unsub", mAObs=-0.8, mARelErr=0.0001,
+                perturbTheoryOAmt=0.0003, MonteCarloN=50, plot=False, resultsFileName="out.csv")
+    from_raw = solveExperimentalData.experimentalDataM1(rtn_means, **args)
+    from_table = solveExperimentalData.experimentalDataM1(bundled, **args)
+    for col in ["Relative Deltas", "Relative Deltas Error"]:
+        assert from_table[col].tolist() == pytest.approx(from_raw[col].tolist(), abs=2e-3), col  # results are rounded to 3 decimals
