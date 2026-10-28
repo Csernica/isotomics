@@ -40,7 +40,7 @@ def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = 
         perturbTheoryOAmt: Used for the 'observed abundance correction' to low abundance peaks. See the appendix to Csernica and Eiler 2023 for details about this correction. A typical value of 0.001 (1 per mil) is a good estimate. Test different values with simulated data to see if your choice is appropriate. 
         MonteCarloN: The number of iterations used for the M+1 monte carlo solver. 
         outputPrecision: The number of decimals to include in the output .csv. 
-        resultsFileName: Filename to export results to. 
+        resultsFileName: Filename to export results to, or None to not write a file.
         plot: If True, return a plot.
         plotPath: If given (and plot is True), also save the plot to this path, e.g. 'M1Output.png'.
 
@@ -105,9 +105,11 @@ def experimentalDataM1(rtnMeans, cwd, MOLECULE_INPUT_PATH, std_deltas, UValue = 
     existing = [c for c in toRound if c in cleanExperimentalOutput.columns]
     if existing:
         cleanExperimentalOutput[existing] = cleanExperimentalOutput[existing].round(decimals=outputPrecision)
-    print(f"Writing experimental results to CSV: {os.path.abspath(resultsFileName)}")
-    cleanExperimentalOutput.to_csv(resultsFileName, index_label='Site Names')
-    print("CSV write complete.")
+    #resultsFileName = None skips writing the results to a file
+    if resultsFileName is not None:
+        print(f"Writing experimental results to CSV: {os.path.abspath(resultsFileName)}")
+        cleanExperimentalOutput.to_csv(resultsFileName, index_label='Site Names')
+        print("CSV write complete.")
 
     if plot:
         fig = sim.plotOutput(mDf)
