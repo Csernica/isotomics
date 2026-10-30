@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.2.4 (2026-10-30)
+
+### Fixed
+
+- **The alanine standard's carbon values were assigned to the wrong sites, which changes results.**
+  The natural-abundance standard (Weiss et al., 2023, Table 2) has −11.9 ‰ for the carboxyl carbon
+  (C-1) and −12.9 and −7.0 ‰ for C-2 and C-3, so −9.95 ‰ for the α/β site. The quickstart, example
+  notebook and tests passed `[-11.9, -9.95, ...]` in the site order Calphabeta, Ccarboxyl; they now
+  pass `[-9.95, -11.9, ...]`. Relative δ values of the quickstart sample change from −0.151 to
+  −0.785 ‰ (Calphabeta) and 31.960 to 31.321 ‰ (Ccarboxyl), in line with the Orbitrap values of
+  Weiss et al. (−0.8 and 32.0 ‰); values in the standard's reference frame change by about 1.3–2.6 ‰.
+  If you used these standard values in your own scripts, check their order.
+
+### Changed
+
+- `experimentalDataM1` prints the full paths of the results CSV and the plot it writes.
+  `resultsFileName=None` skips writing the CSV.
+
+### Documentation
+
+- The experimental tutorial compares the results with Weiss et al. (2023) and explains how to set up
+  your own data.
+
 ## 0.2.3 (2026-10-28)
 
 ### Fixed
